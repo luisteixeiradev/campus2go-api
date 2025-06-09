@@ -92,3 +92,22 @@ exports.emailChanged = async (user) => {
     }
 
 }
+
+exports.PromoterCreated = async (user, password) => {
+
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: user.email,
+        subject: 'Promoter Created',
+        text: `Your account has been created.\nEmail: ${user.email}\nPassword: ${password}`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return false;
+    }
+
+}

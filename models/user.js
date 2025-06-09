@@ -4,15 +4,9 @@ const { v7 } = uuid;
 module.exports = (sequelize, DataTypes) => {
     const User = sequelize.define('User', {
 
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true,
-            allowNull: false
-        },
         uuid: {
             type: DataTypes.UUID,
-            defaultValue: v7(),
+            defaultValue: ()=>v7(),
             unique: true,
             primaryKey: true,
             allowNull: false
@@ -30,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        type: {
+        role: {
             type: DataTypes.ENUM('admin', "promoter", "client"),
             defaultValue: 'client'
         },
@@ -42,19 +36,19 @@ module.exports = (sequelize, DataTypes) => {
     },
         {
             timestamps: true,
-            tableName: 'users',
-            hooks: {
-                // afterCreate: (user) => {
-                //     delete user.dataValues.id;
-                //     delete user.dataValues.password;
-                //     delete user.dataValues.createdAt;
-                //     delete user.dataValues.updatedAt;
-                //     delete user.dataValues.active;
-                //     delete user.dataValues.type;
-                // }
-            }
+            tableName: 'users'
         },
     );
+
+    User.associate = (models) => {
+
+        User.belongsToMany(models.Promoter, {
+            through: models.UsersHasPromoters,
+            foreignKey: 'user',
+            otherKey: 'promoter'
+        });
+
+    }
 
     return User;
 

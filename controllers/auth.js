@@ -53,7 +53,7 @@ exports.authenticate = async (req, res) => {
         });
 
         if (!user || !bcrypt.compareSync(password, user.password)) {
-            return res.status(200).send({
+            return res.status(400).send({
                 msg: "user not found"
             });
         } else if (!user.active) {

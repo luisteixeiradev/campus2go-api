@@ -3,14 +3,15 @@ const models = require('../models');
 
 exports.generateToken = async (data, type) => {
 
-    if (type !== 'auth' && type !== 'active' && type !== 'forgotPassword') {
+    if (type !== 'auth' && type !== 'active' && type !== 'forgotPassword' && type !== 'session' && type !== 'purchase') {
         throw new Error('Invalid token type');
     }
+
     const token = await jwt.sign({
         uuid: data.uuid,
         type
     }, process.env.JWT_SECRET, {
-        expiresIn: '1d'
+        expiresIn: '128d'
     });
     return token;
 
@@ -30,7 +31,7 @@ exports.decodeToken = async (token) => {
 exports.getUserFromToken = async (token) => {
 
     const decoded = await this.decodeToken(token);
-    
+
     const user = await models.User.findOne({
         where: {
             uuid: decoded.uuid
@@ -45,5 +46,44 @@ exports.getUserFromToken = async (token) => {
     }
 
     return user;
+
+}
+
+exports.getPromoterFromUser = async (user) => {
+
+    // const user = await models.User.findOne({
+    //     where: {
+    //         uuid: req.user.uuid
+    //     },
+    //     // include: [{
+    //     //     model: models.Promoter,
+    //     //     as: 'promoter',
+    //     // }],
+    // });
+
+    // if (!user) {
+    //     return res.status(404).send({
+    //         error: "user not found"
+    //     });
+    // }
+
+    const promoters = await models.Promoter.findAll({
+        include: [{
+          model: models.User,
+          as: 'users', // este alias tem de ser igual ao definido em Promoter.associate
+          where: { uuid: user },
+        //   attributes: [], // não queremos dados do User, apenas filtrar
+          through: { attributes: [] }, // remove dados da tabela de junção
+        }]
+      });
+
+
+    if (promoters.length === 0) {
+        return res.status(404).send({
+            error: "promoter not found"
+        });
+    }
+
+    return promoters[0];
 
 }

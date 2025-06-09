@@ -8,11 +8,13 @@ app.use(cors());
 
 const models = require('./models');
 models.sequelize
-    .sync({ alter: true })
+    // .sync({ alter: true, force: true })
+    .sync()
     .then(() => console.log("Base de dados sincronizada!"))
     .catch((err) => console.error("Erro ao sincronizar BD:", err));
 
 app.use(require('./routes/index'));
+// require('./utils/sessionCleaner') // Importando o limpador de sessões expiradas
 
 app.get('/', (req, res) => {
 
