@@ -48,7 +48,8 @@ router.route('/:id')
         body('endDate').optional().isDate().withMessage('End date must be a valid date'),
         body('image').optional().isURL().withMessage('Image must be a valid URL'),
         body('promoter').optional().isUUID().withMessage('Promoter must be a valid UUID'),
-        body('space').optional().isUUID().withMessage('Space must be a valid UUID')
+        body('space').optional().isUUID().withMessage('Space must be a valid UUID'),
+        body('active').optional().isBoolean().withMessage('Active must be a boolean'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.updateEvent)
     .delete([
         param('id').isUUID().withMessage('ID must be a valid UUID')

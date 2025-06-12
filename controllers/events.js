@@ -180,7 +180,7 @@ exports.createEvent = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
     const { id } = req.params;
-    const { name, description, startDate, endDate, promoter, space } = req.body;
+    const { name, description, startDate, endDate, promoter, space, active } = req.body;
 
     try {
         const event = await models.Event.findOne({
@@ -199,7 +199,8 @@ exports.updateEvent = async (req, res) => {
             description,
             startDate,
             endDate,
-            space
+            space,
+            active
         };
 
         if (req.user.role === 'admin') {
