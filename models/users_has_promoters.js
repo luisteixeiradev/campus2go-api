@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     const UsersHasPromoters = sequelize.define('UsersHasPromoters', {
         user: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         promoter: {
             type: DataTypes.STRING,

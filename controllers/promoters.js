@@ -99,7 +99,7 @@ exports.createPromoter = async (req, res) => {
 
 exports.getPromoter = async (req, res) => {
     try {
-        
+
         const { uuid } = req.params;
 
         const promoter = await models.Promoter.findOne({
@@ -125,12 +125,12 @@ exports.getPromoter = async (req, res) => {
                 }
             }
         }
-         else {
+        else {
             delete promoter.dataValues.users;
             return res.status(200).send(promoter);
         }
 
-        
+
     } catch (error) {
         console.log(error);
 
@@ -175,7 +175,7 @@ exports.getPromoterUsers = async (req, res) => {
     try {
         const { uuid } = req.params;
 
-        const   users = await models.User.findAll({
+        const users = await models.User.findAll({
             include: [{
                 model: models.Promoter,
                 where: { uuid: uuid },
@@ -187,7 +187,7 @@ exports.getPromoterUsers = async (req, res) => {
             }
         });
 
-        return res.status(200).send({users});
+        return res.status(200).send({ users });
     } catch (error) {
         console.log(error);
 
@@ -310,6 +310,86 @@ exports.getPromoterUser = async (req, res) => {
 
         return res.status(500).send({
             error: "error when getting promoter user"
+        });
+    }
+}
+
+exports.getMyPromoter = async (req, res) => {
+
+    try {
+        const { user } = req;
+
+        if (!user) {
+            return res.status(401).send({
+                error: "Unauthorized"
+            });
+        }
+
+        const promoter = await models.Promoter.findOne({
+            include: [
+                {
+                    model: models.User,
+                    as: 'users',
+                    where: { uuid: user.uuid },
+                    through: { attributes: [] },
+                    attributes: []
+                }
+            ]
+        });
+
+        if (!promoter) {
+            return res.status(404).send({
+                error: "Promoter not found"
+            });
+        }
+
+        return res.status(200).send({promoter});
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).send({
+            error: "error when getting my promoter"
+        });
+    }
+
+}
+
+exports.getPromoterEvents = async (req, res) => {
+    try {
+        const { uuid } = req.params;
+        const { page = 1, limit = 10, include } = req.query;
+
+        const promoter = await models.Promoter.findOne({ where: { uuid } });
+
+        if (!promoter) {
+            return res.status(404).send({
+                error: "Promoter not found"
+            });
+        }
+
+        const query = {
+            where: { promoter: uuid },
+            limit,
+            offset: (page - 1) * limit,
+            include: []
+        };
+
+        if (include) {
+            query.include.push({
+                model: models.Event,
+                as: 'events',
+                attributes: ['uuid', 'name', 'date']
+            });
+        }
+
+        const events = await models.Event.findAll(query);
+
+        return res.status(200).send(events);
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).send({
+            error: "error when getting promoter events"
         });
     }
 }

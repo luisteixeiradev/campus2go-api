@@ -37,7 +37,7 @@ exports.register = async (req, res) => {
 
 }
 
-exports.authenticate = async (req, res) => {
+exports.authenticate = async (req, res) => {    
 
     try {
         
@@ -67,7 +67,6 @@ exports.authenticate = async (req, res) => {
         delete user.dataValues.createdAt;
         delete user.dataValues.updatedAt;
         delete user.dataValues.active;
-        delete user.dataValues.id;
 
         return res.status(200).send({
             user, token: tokenGenerated

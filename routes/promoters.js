@@ -31,6 +31,11 @@ router.route('/')
         body('user.email').notEmpty().isEmail().withMessage('User email is required and must be a valid email'),
     ], validationRoute, auth.auth, auth.isAdmin, Controller.createPromoter)
 
+router.route('/me')
+    .get([
+        query('include').optional().isString().withMessage('Includes must be a string'),
+    ], validationRoute, auth.ifUSer, Controller.getMyPromoter)
+
 router.route('/:uuid')
     .get([
         param('uuid').notEmpty().isString().withMessage('UUID is required and must be a string'),
@@ -68,6 +73,12 @@ router.route('/:uuid/users/:userUuid')
     ], validationRoute, auth.auth, auth.isAdmin, Controller.deletePromoterUser)
 
 router.route('/:uuid/events')
+    .get([
+        param('uuid').notEmpty().isString().withMessage('UUID is required and must be a string'),
+        query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+        query('limit').optional().isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
+        query('include').optional().isString().withMessage('Includes must be a string'),
+    ], validationRoute, auth.auth, auth.isAvailablePromoter, Controller.getPromoterEvents)
     
     
 module.exports = router;

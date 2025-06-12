@@ -3,25 +3,44 @@ const models = require('../models');
 
 exports.getAllEvents = async (req, res) => {
 
-    const { page = 1, limit = 10, startDate, endDate, name, active = true, include, sort = "startDate", order = "asc" } = req.query;
+    const { page = 1, limit = 10, startDate, endDate, name, active, include, sort = "startDate", order = "asc", promoter } = req.query;
 
     const offset = (page - 1) * limit;
 
-    const whereClause = {
-        active: active === 'true' ? true : false
-    };
 
-    if (startDate && endDate) {
+    const whereClause = {};
+
+    if (active) {
+        whereClause.active = active === 'true' ? true : false
+    }
+
+    if (startDate) {
         whereClause.startDate = {
-            [models.Sequelize.Op.gte]: new Date(startDate),
+            [models.Sequelize.Op.gte]: new Date(startDate)
+        };
+    }
+
+    if (endDate) {
+        whereClause.endDate = {
             [models.Sequelize.Op.lte]: new Date(endDate)
         };
     }
+
+    // if (startDate && endDate) {
+    //     whereClause.startDate = {
+    //         [models.Sequelize.Op.gte]: new Date(startDate),
+    //         [models.Sequelize.Op.lte]: new Date(endDate)
+    //     };
+    // }
 
     if (name) {
         whereClause.name = {
             [models.Sequelize.Op.like]: `%${name}%`
         };
+    }
+
+    if (promoter) {
+        whereClause.promoter = promoter;
     }
 
     const includeArray = [];
@@ -52,7 +71,8 @@ exports.getAllEvents = async (req, res) => {
             where: whereClause,
             limit,
             offset,
-            include: includeArray
+            include: includeArray,
+            order: [[sort, order]],
         });
 
         return res.status(200).json({

@@ -32,7 +32,7 @@ router.route('/me')
     .put([
         body('name').optional().isString().withMessage('Name is invalid'),
         body('email').optional().isEmail().withMessage('Email is invalid'),
-    ], auth.auth, validationRoute, Controller.updateMe)
+    ], validationRoute, auth.auth, Controller.updateMe)
 
 router.route('/:uuid')
     .get([

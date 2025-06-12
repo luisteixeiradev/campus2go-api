@@ -15,13 +15,14 @@ router.route('/')
     .get([
         query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
         query('limit').optional().isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
-        query('startDate').optional().isDate().withMessage('Start date must be a valid date'),
-        query('endDate').optional().isDate().withMessage('End date must be a valid date'),
+        query('startDate').optional().isISO8601().withMessage('Start date must be a valid date'),
+        query('endDate').optional().isISO8601() .withMessage('End date must be a valid date'),
         query('name').optional().isString().withMessage('Name must be a string'),
         query('include').optional().isString().withMessage('Includes must be a string'),
         query('active').optional().isBoolean().withMessage('active must be a boolean'),
         query('sort').optional().isString().withMessage('Sort must be a string'),
         query('order').optional().isString().withMessage('Order must be a string'),
+        query('promoter').optional().isUUID().withMessage('Promoter must be a valid UUID')
     ], validationRoute, Controller.getAllEvents)
     .post([
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
