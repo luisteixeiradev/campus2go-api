@@ -10,7 +10,9 @@ exports.getAllEvents = async (req, res) => {
 
     const whereClause = {};
 
-    if (active) {
+    if (active in req) {
+        console.log(`Active: ${active}`);
+        
         whereClause.active = active === 'true' ? true : false
     }
 
