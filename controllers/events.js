@@ -3,29 +3,27 @@ const models = require('../models');
 
 exports.getAllEvents = async (req, res) => {
 
-    const { page = 1, limit = 10, startDate, endDate, name, active, include, sort = "startDate", order = "asc", promoter } = req.query;
+    const { page = 1, limit = 10, startDate, endDate, name, active=undefined, include, sort = "startDate", order = "asc", promoter } = req.query;
 
     const offset = (page - 1) * limit;
 
 
     const whereClause = {};
 
-    if (active in req) {
-        console.log(`Active: ${active}`);
-        
-        whereClause.active = active === 'true' ? true : false
+    if (active !== undefined) {
+        whereClause.active = active === 'true' ? true : false;
     }
 
-    if (startDate) {
-        whereClause.startDate = {
-            [models.Sequelize.Op.gte]: new Date(startDate)
-        };
-    }
+    if (startDate || endDate) {
+        whereClause.startDate = {};
 
-    if (endDate) {
-        whereClause.endDate = {
-            [models.Sequelize.Op.lte]: new Date(endDate)
-        };
+        if (startDate) {
+            whereClause.startDate[models.Sequelize.Op.gte] = new Date(startDate);
+        }
+
+        if (endDate) {
+            whereClause.startDate[models.Sequelize.Op.lte] = new Date(endDate);
+        }
     }
 
     // if (startDate && endDate) {
@@ -94,7 +92,7 @@ exports.getAllEvents = async (req, res) => {
 
 exports.getEventById = async (req, res) => {
     const { id } = req.params;
-    const { include, availableTickets='true' } = req.query;
+    const { include, availableTickets = 'true' } = req.query;
 
     try {
 
@@ -118,19 +116,19 @@ exports.getEventById = async (req, res) => {
                     });
                 } else if (inc === 'availableTickets') {
                     includeArray.push({
-                    model: models.AvailableTicket,
-                    as: 'availableTickets',
-                    where: { active: availableTickets == 'true'? true : false },
-                    required: false,
-                    attributes: ['uuid', 'name', 'price', 'max'],
-                    include: [
-                        {
-                            model: models.Zone,
-                            as: 'zoneDetails',
-                            attributes: ['uuid', 'name']
-                        }
-                    ]
-                });
+                        model: models.AvailableTicket,
+                        as: 'availableTickets',
+                        where: { active: availableTickets == 'true' ? true : false },
+                        required: false,
+                        attributes: ['uuid', 'name', 'price', 'max'],
+                        include: [
+                            {
+                                model: models.Zone,
+                                as: 'zoneDetails',
+                                attributes: ['uuid', 'name']
+                            }
+                        ]
+                    });
                 }
             });
         }
