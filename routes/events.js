@@ -27,8 +27,8 @@ router.route('/')
     .post([
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
         body('description').optional().isString().withMessage('Description must be a string'),
-        body('startDate').notEmpty().isDate().withMessage('Start date is required and must be a valid date'),
-        body('endDate').notEmpty().isDate().withMessage('End date is required and must be a valid date'),
+        body('startDate').notEmpty().isString().withMessage('Start date is required and must be a valid date'),
+        body('endDate').notEmpty().isString().withMessage('End date is required and must be a valid date'),
         body('image').optional().isURL().withMessage('Image must be a valid URL'),
         body('promoter').optional().isUUID().withMessage('Promoter is required and must be a valid UUID'),
         body('space').notEmpty().isUUID().withMessage('Space is required and must be a valid UUID')
