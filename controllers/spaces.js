@@ -1,19 +1,32 @@
 const models = require('../models');
-const { fn, col } = require('sequelize');
+const token = require('../utils/token');
 
 exports.getAllSpaces = async (req, res) => {
 
     try {
-        const { page = 1, limit = 10, public: isPublic, name, include } = req.query;
+        const { page = 1, limit = 10, public: isPublic = undefined, name, include } = req.query;
 
         const query = {
             where: {},
         };
 
-        if (isPublic) {
-            query.where.public = isPublic;
+
+        // if (req.user.role === "promoter") {
+        //     query.where.promoter = promoter.uuid;
+        // } else if (req.user.role === "admin") {
+        //     query.where.promoter = null;
+        // }
+
+        if (req.user.role === "promoter") {
+            const promoter = await token.getPromoterFromUser(req.user);
+            query.where[models.Sequelize.Op.or] = [
+                { public: true },
+                { promoter: promoter.uuid }
+            ];
+        } else if (req.user.role === "admin") {
+            query.where.promoter = null;
         } else {
-            query.where.public = false;
+            query.where.public = true; // For other roles, only public spaces are returned
         }
 
         if (name) {

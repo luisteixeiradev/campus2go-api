@@ -18,7 +18,7 @@ router.route('/')
         query('public').optional().isBoolean().withMessage('Public must be a boolean'),
         query('name').optional().isString().withMessage('Name must be a string'),
         query('include').optional().isString().withMessage('Includes must be a string'),
-    ], validationRoute, Controller.getAllSpaces)
+    ], validationRoute, auth.ifUSer, Controller.getAllSpaces)
     .post([
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
         body('address.street').notEmpty().isString().withMessage('Street is required and must be a string'),
