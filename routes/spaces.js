@@ -15,7 +15,7 @@ router.route('/')
     .get([
         query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
         query('limit').optional().isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
-        query('public').optional().isBoolean().withMessage('Public must be a boolean'),
+        // query('public').optional().isBoolean().withMessage('Public must be a boolean'),
         query('name').optional().isString().withMessage('Name must be a string'),
         query('include').optional().isString().withMessage('Includes must be a string'),
     ], validationRoute, auth.ifUSer, Controller.getAllSpaces)

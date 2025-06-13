@@ -1,30 +1,28 @@
 const models = require('../models');
 const token = require('../utils/token');
+const { Op, or } = require('sequelize');
 
 exports.getAllSpaces = async (req, res) => {
 
     try {
         const { page = 1, limit = 10, public: isPublic = undefined, name, include } = req.query;
+        const { user } = req;
 
         const query = {
             where: {},
         };
 
 
-        // if (req.user.role === "promoter") {
-        //     query.where.promoter = promoter.uuid;
-        // } else if (req.user.role === "admin") {
-        //     query.where.promoter = null;
-        // }
-
-        if (req.user.role === "promoter") {
-            const promoter = await token.getPromoterFromUser(req.user);
-            query.where[models.Sequelize.Op.or] = [
-                { public: true },
-                { promoter: promoter.uuid }
-            ];
-        } else if (req.user.role === "admin") {
-            query.where.promoter = null;
+        if (req.user) {
+            if (req.user.role == "promoter") {
+                const promoter = await token.getPromoterFromUser(user.uuid);
+                query.where[Op.or] = [
+                    { public: true },
+                    { promoter: promoter.uuid }
+                ];
+            } else if (req.user.role === "admin") {
+                query.where.promoter = null;
+            }
         } else {
             query.where.public = true; // For other roles, only public spaces are returned
         }
@@ -69,6 +67,7 @@ exports.getAllSpaces = async (req, res) => {
                 ]
             },
             include: includeArray,
+            order: [['name', 'ASC']]
         });
 
         return res.status(200).send(spaces);
@@ -151,12 +150,12 @@ exports.createSpace = async (req, res) => {
             map
         }
 
-        req.user.role == "admin"?json['public']=public:json['public']=false;
+        req.user.role == "admin" ? json['public'] = public : json['public'] = false;
         //Ir buscar o promoter do usuario. Vai estar na validação de acesso
-        req.user.role == "promoter"?json['promoter']=req.promoter.uuid:json['promoter']=null;
+        req.user.role == "promoter" ? json['promoter'] = req.promoter.uuid : json['promoter'] = null;
 
         const space = await models.Space.create(
-           json
+            json
         );
 
         return res.status(201).send(space);
@@ -193,7 +192,7 @@ exports.updateSpace = async (req, res) => {
             map
         }
 
-        res.user.role = "admin"?json['public']=public:json['public']=space.public;
+        res.user.role = "admin" ? json['public'] = public : json['public'] = space.public;
 
         await space.update({
             json
