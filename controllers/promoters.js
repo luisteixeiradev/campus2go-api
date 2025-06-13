@@ -2,6 +2,7 @@ const models = require('../models');
 const bcrypt = require('bcryptjs');
 const generatePassword = require('generate-password');
 const sendEmails = require('../utils/sendEmails');
+const { parse } = require('dotenv');
 
 exports.getAllPromoters = async (req, res) => {
 
@@ -10,8 +11,8 @@ exports.getAllPromoters = async (req, res) => {
 
         const query = {
             where: {},
-            limit,
-            offset: (page - 1) * limit
+            limit: parseInt(limit),
+            offset: (parseInt(page) - 1) * parseInt(limit)
         };
 
         if (name) {

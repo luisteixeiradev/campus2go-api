@@ -5,7 +5,7 @@ exports.getAllEvents = async (req, res) => {
 
     const { page = 1, limit = 10, startDate, endDate, name, active=undefined, include, sort = "startDate", order = "asc", promoter } = req.query;
 
-    const offset = (page - 1) * limit;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
 
 
     const whereClause = {};
@@ -69,7 +69,7 @@ exports.getAllEvents = async (req, res) => {
     try {
         const events = await models.Event.findAndCountAll({
             where: whereClause,
-            limit,
+            limit: parseInt(limit),
             offset,
             include: includeArray,
             order: [[sort, order]],

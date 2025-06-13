@@ -52,8 +52,8 @@ exports.getAllSpaces = async (req, res) => {
 
         const spaces = await models.Space.findAll({
             ...query,
-            limit,
-            offset: (page - 1) * limit,
+            limit: parseInt(limit),
+            offset: (parseInt(page) - 1) * parseInt(limit),
             attributes: {
                 include: [
                     [

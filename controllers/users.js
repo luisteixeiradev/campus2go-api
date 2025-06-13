@@ -16,7 +16,7 @@ exports.getAllUsers = async (req, res) => {
             },
             order: [[sort, 'DESC']],
             limit: parseInt(limit),
-            offset: (page - 1) * limit
+            offset: (page - 1) * parseInt(limit)
         };
 
         if (fields) {
