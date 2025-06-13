@@ -1,9 +1,8 @@
-const { where } = require('sequelize');
 const models = require('../models');
 
 exports.getAllEvents = async (req, res) => {
 
-    const { page = 1, limit = 10, startDate, endDate, name, active=undefined, include, sort = "startDate", order = "asc", promoter } = req.query;
+    const { page = 1, limit = 10, startDate, endDate, name, active = undefined, include, sort = "startDate", order = "asc", promoter } = req.query;
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
@@ -227,16 +226,39 @@ exports.deleteEvent = async (req, res) => {
             where: {
                 uuid: id,
                 ...(req.user.role === 'promoter' ? { promoter: req.promoter.uuid } : {})
-            }
+            },
+            include: [
+                {
+                    model: models.AvailableTicket,
+                    as: 'availableTickets',
+                    attributes: {
+                        include: [
+                            [
+                                models.Sequelize.literal(`(
+              SELECT COUNT(*) FROM luistei3_campus2go.tickets as t WHERE t.availableTicket = availableTickets.uuid
+            )`),
+                                'ticketsCount',
+                            ],
+                        ],
+                    },
+                },
+            ],
         });
 
         if (!event) {
             return res.status(404).json({ msg: 'Event not found' });
         }
 
+        for (const ticket of  event.dataValues.availableTickets) {
+            if (ticket.dataValues.ticketsCount > 0) {             
+                return res.status(400).json({ msg: 'Cannot delete event with existing tickets' });
+            }
+        }
+
         await event.destroy();
 
         return res.status(200).json({ msg: 'Event deleted successfully' });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: 'Internal server error' });
