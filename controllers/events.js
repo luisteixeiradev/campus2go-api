@@ -119,12 +119,12 @@ exports.getEventById = async (req, res) => {
                         as: 'availableTickets',
                         where: { active: availableTickets == 'true' ? true : false },
                         required: false,
-                        attributes: ['uuid', 'name', 'price', 'max'],
+                        attributes: ['uuid', 'name', 'price', 'capacity', 'active'],
                         include: [
                             {
                                 model: models.Zone,
                                 as: 'zoneDetails',
-                                attributes: ['uuid', 'name']
+                                attributes: ['uuid', 'name', 'space', 'capacity'],
                             }
                         ]
                     });
