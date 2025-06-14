@@ -249,6 +249,10 @@ exports.deleteEvent = async (req, res) => {
             return res.status(404).json({ msg: 'Event not found' });
         }
 
+        if (event.dataValues.active) {
+            return res.status(400).json({ msg: 'Cannot delete an active event' });
+        }
+
         for (const ticket of  event.dataValues.availableTickets) {
             if (ticket.dataValues.ticketsCount > 0) {             
                 return res.status(400).json({ msg: 'Cannot delete event with existing tickets' });
