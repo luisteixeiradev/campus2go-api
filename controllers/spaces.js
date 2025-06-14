@@ -20,8 +20,6 @@ exports.getAllSpaces = async (req, res) => {
                     { public: true },
                     { promoter: promoter.uuid }
                 ];
-            } else if (req.user.role === "admin") {
-                query.where.promoter = null;
             }
         } else {
             query.where.public = true; // For other roles, only public spaces are returned
