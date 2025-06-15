@@ -105,6 +105,7 @@ exports.createPromoter = async (req, res) => {
 
         return res.status(201).send({
             msg: "Promoter created",
+            promoter: promoter
         });
     } catch (error) {
         console.log(error);
