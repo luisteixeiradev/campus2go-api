@@ -2,7 +2,8 @@ const models = require('../models');
 const bcrypt = require('bcryptjs');
 const generatePassword = require('generate-password');
 const sendEmails = require('../utils/sendEmails');
-const { parse } = require('dotenv');
+const multer = require('multer');
+const upload = multer({ dest: 'public/images/promoters' });
 
 exports.getAllPromoters = async (req, res) => {
 
@@ -409,6 +410,41 @@ exports.getPromoterEvents = async (req, res) => {
 
         return res.status(500).send({
             error: "error when getting promoter events"
+        });
+    }
+}
+
+exports.updatePromoterImage = async (req, res) => {
+    try {
+        const { uuid } = req.params;
+
+        const promoter = await models.Promoter.findOne({ where: { uuid } });
+
+        if (!promoter) {
+            return res.status(404).send({
+                error: "Promoter not found"
+            });
+        }
+
+        if (!req.file) {
+            return res.status(400).send({
+                error: "Image file is required"
+            });
+        }
+
+        const imagePath = `/images/promoters/${req.file.filename}`;
+
+        await promoter.save({ image: imagePath });
+
+        return res.status(200).send({
+            msg: "Promoter image updated",
+            image: imagePath
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).send({
+            error: "error when updating promoter image"
         });
     }
 }

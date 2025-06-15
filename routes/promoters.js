@@ -3,6 +3,7 @@ const router = express.Router();
 const Controller = require('../controllers/promoters');
 const validationRoute = require('../middlewares/validationRoute');
 const auth = require('../middlewares/auth');
+const upload = require('../middlewares/upload');
 
 const {
     query,
@@ -56,6 +57,11 @@ router.route('/:uuid')
         body('email').optional().isEmail().withMessage('Email must be a valid email'),
         body('phone').optional().isString().withMessage('Phone must be a string'),
     ], validationRoute, auth.auth, auth.isAvailablePromoter, Controller.updatePromoter)
+
+router.route('/:uuid/image')
+    .put([
+        param('uuid').notEmpty().isString().withMessage('UUID is required and must be a string'),
+    ], validationRoute, auth.auth, auth.isAvailablePromoter, upload.promoter.single('image'), Controller.updatePromoterImage)
 
 router.route('/:uuid/users')
     .get([
