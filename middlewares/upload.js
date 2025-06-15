@@ -13,7 +13,7 @@ const createStorage = (folderName) => {
       cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
-      cb(null, `${folderName}-${req.params.uuid}${path.extname(file.originalname)}`);
+      cb(null, `${req.params.uuid}${path.extname(file.originalname)}`);
     }
   });
 };

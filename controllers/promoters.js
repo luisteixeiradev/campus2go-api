@@ -432,7 +432,7 @@ exports.updatePromoterImage = async (req, res) => {
 
         const imagePath = `/images/promoters/${req.file.filename}`;
 
-        await promoter.save({ image: imagePath });
+        await promoter.update({ image: imagePath });
 
         return res.status(200).send({
             msg: "Promoter image updated",
