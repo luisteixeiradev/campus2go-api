@@ -2,8 +2,6 @@ const models = require('../models');
 const bcrypt = require('bcryptjs');
 const generatePassword = require('generate-password');
 const sendEmails = require('../utils/sendEmails');
-const multer = require('multer');
-const upload = multer({ dest: 'public/images/promoters' });
 
 exports.getAllPromoters = async (req, res) => {
 
