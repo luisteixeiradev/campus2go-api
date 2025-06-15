@@ -7,12 +7,13 @@ const { parse } = require('dotenv');
 exports.getAllPromoters = async (req, res) => {
 
     try {
-        const { page = 1, limit = 10, name } = req.query;
+        const { page = 1, limit = 10, name, email, vat, sort = "name", order = "asc" } = req.query;
 
         const query = {
             where: {},
             limit: parseInt(limit),
-            offset: (parseInt(page) - 1) * parseInt(limit)
+            offset: (parseInt(page) - 1) * parseInt(limit),
+            order: [[sort, order]],
         };
 
         if (name) {
@@ -21,9 +22,26 @@ exports.getAllPromoters = async (req, res) => {
             };
         }
 
-        const promoters = await models.Promoter.findAll(query);
+        if (email) {
+            query.where.email = {
+                [models.Sequelize.Op.like]: `%${email}%`
+            };
+        }
+        if (vat) {
+            query.where.vat = {
+                [models.Sequelize.Op.like]: `%${vat}%`
+            };
+        }
 
-        return res.status(200).send(promoters);
+        const promoters = await models.Promoter.findAndCountAll(query);
+
+        return res.status(200).send({
+            promoters: promoters.rows,
+            totalItems: promoters.count,
+            totalPages: Math.ceil(promoters.count / limit),
+            currentPage: parseInt(page),
+            itemsPerPage: parseInt(limit)
+        });
     } catch (error) {
         console.log(error);
 
@@ -344,7 +362,7 @@ exports.getMyPromoter = async (req, res) => {
             });
         }
 
-        return res.status(200).send({promoter});
+        return res.status(200).send({ promoter });
     } catch (error) {
         console.log(error);
 

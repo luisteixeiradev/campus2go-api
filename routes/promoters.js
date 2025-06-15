@@ -15,7 +15,12 @@ router.route('/')
         query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
         query('limit').optional().isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
         query('name').optional().isString().withMessage('Name must be a string'),
+        query('email').optional().isEmail().withMessage('Email must be a valid email'),
+        query('vat').optional().isString().withMessage('VAT must be a string'),
         query('include').optional().isString().withMessage('Includes must be a string'),
+        
+        query('sort').optional().isString().withMessage('Sort must be a string'),
+        query('order').optional().isIn(['asc', 'desc']).withMessage('Order must be either "asc" or "desc"'),
     ], validationRoute, Controller.getAllPromoters)
     .post([
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
