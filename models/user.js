@@ -48,6 +48,11 @@ module.exports = (sequelize, DataTypes) => {
             otherKey: 'promoter'
         });
 
+        User.hasMany(models.Purchase, {
+            foreignKey: 'user',
+            as: 'purchases'
+        });
+
     }
 
     return User;
