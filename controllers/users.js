@@ -154,7 +154,7 @@ exports.updateUser = async (req, res) => {
 
         email?user.email = email:user.email;
         name?user.name = name:user.name;
-        active?user.active = active:user.active;
+        active !== undefined?user.active = active:user.active;
         role?user.role = role:user.role;
         password?user.password = bcrypt.hashSync(password, 10):user.password = user.password;
 
