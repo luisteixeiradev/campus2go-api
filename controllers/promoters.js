@@ -202,7 +202,7 @@ exports.getPromoterUsers = async (req, res) => {
                 through: { attributes: [] }
             }],
             attributes: {
-                exclude: ['password', 'active']
+                exclude: ['password']
             }
         });
 
