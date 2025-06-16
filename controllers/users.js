@@ -158,7 +158,7 @@ exports.updateUser = async (req, res) => {
         role?user.role = role:user.role;
         password?user.password = bcrypt.hashSync(password, 10):user.password = user.password;
 
-        await user.update();
+        await user.save();
 
         return res.status(200).send({
             msg: "user updated"
