@@ -1,6 +1,7 @@
 const models = require('../models');
 const bcrypt = require('bcryptjs');
 const { Op } = require('sequelize');
+const sendEmails = require('../utils/sendEmails');
 
 exports.getAllUsers = async (req, res) => {
 
@@ -184,10 +185,12 @@ exports.deleteUser = async (req, res) => {
                 error: "user not found"
             });
         }
-
+        const email = user.email;
         await user.destroy();
 
-        return res.status(200).send({
+        sendEmails.userDeleted(user);
+
+        res.status(200).send({
             msg: "user deleted"
         });
 

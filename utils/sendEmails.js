@@ -111,3 +111,22 @@ exports.PromoterCreated = async (user, password) => {
     }
 
 }
+
+exports.userDeleted = async (user) => {
+    
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: user.email,
+        subject: 'Account Deleted',
+        text: `Your account has been deleted.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return false;
+    }
+
+}
