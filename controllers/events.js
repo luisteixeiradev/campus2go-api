@@ -1,4 +1,5 @@
 const models = require('../models');
+const promoter = require('../models/promoter');
 
 exports.getAllEvents = async (req, res) => {
 
@@ -253,8 +254,8 @@ exports.deleteEvent = async (req, res) => {
             return res.status(400).json({ msg: 'Cannot delete an active event' });
         }
 
-        for (const ticket of  event.dataValues.availableTickets) {
-            if (ticket.dataValues.ticketsCount > 0) {             
+        for (const ticket of event.dataValues.availableTickets) {
+            if (ticket.dataValues.ticketsCount > 0) {
                 return res.status(400).json({ msg: 'Cannot delete event with existing tickets' });
             }
         }
@@ -263,6 +264,36 @@ exports.deleteEvent = async (req, res) => {
 
         return res.status(200).json({ msg: 'Event deleted successfully' });
 
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+    }
+}
+
+exports.uploadEventImage = async (req, res) => {
+    const { uuid } = req.params;
+
+    try {
+        const event = await models.Event.findOne({
+            where: { uuid }
+        });
+
+        if (!event) {
+            return res.status(404).json({ msg: 'Event not found' });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ msg: 'No file uploaded' });
+        }
+
+        const imagePath = `/images/events/${req.file.filename}`;
+
+        await event.update({ image: imagePath });
+
+        return res.status(200).json({
+            msg: 'Image uploaded successfully',
+            image: imagePath
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: 'Internal server error' });

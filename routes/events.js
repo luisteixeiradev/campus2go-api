@@ -4,6 +4,7 @@ const Controller = require('../controllers/events');
 const validationRoute = require('../middlewares/validationRoute');
 const auth = require('../middlewares/auth');
 const token = require('../utils/token');
+const upload = require('../middlewares/upload');
 
 const {
     query,
@@ -54,6 +55,11 @@ router.route('/:id')
     .delete([
         param('id').isUUID().withMessage('ID must be a valid UUID')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.deleteEvent);
+
+router.route('/:uuid/image')
+    .put([
+        param('uuid').isUUID().withMessage('UUID must be a valid UUID'),
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, upload.event.single('image'), Controller.uploadEventImage);
 
 router.use('/:id/available-tickets', require('./availableTickets'));
 router.use('/:id/forms', require('./forms'));
