@@ -1,4 +1,5 @@
 const models = require('../models');
+const availableTicket = require('../models/availableTicket');
 const promoter = require('../models/promoter');
 
 exports.getAllEvents = async (req, res) => {
@@ -91,7 +92,7 @@ exports.getAllEvents = async (req, res) => {
 }
 
 exports.getEventById = async (req, res) => {
-    const { id } = req.params;
+    const { uuid } = req.params;
     const { include, availableTickets = 'true' } = req.query;
 
     try {
@@ -135,7 +136,7 @@ exports.getEventById = async (req, res) => {
 
         const event = await models.Event.findOne({
             where: {
-                uuid: id
+                uuid: uuid
             },
             include: includeArray,
         });
@@ -179,13 +180,13 @@ exports.createEvent = async (req, res) => {
 }
 
 exports.updateEvent = async (req, res) => {
-    const { id } = req.params;
+    const { uuid } = req.params;
     const { name, description, startDate, endDate, promoter, space, active } = req.body;
 
     try {
         const event = await models.Event.findOne({
             where: {
-                uuid: id,
+                uuid: uuid,
                 ...(req.user.role === 'promoter' ? { promoter: req.promoter.uuid } : {})
             }
         });
@@ -220,12 +221,12 @@ exports.updateEvent = async (req, res) => {
 }
 
 exports.deleteEvent = async (req, res) => {
-    const { id } = req.params;
+    const { uuid } = req.params;
 
     try {
         const event = await models.Event.findOne({
             where: {
-                uuid: id,
+                uuid: uuid,
                 ...(req.user.role === 'promoter' ? { promoter: req.promoter.uuid } : {})
             },
             include: [
@@ -293,6 +294,151 @@ exports.uploadEventImage = async (req, res) => {
         return res.status(200).json({
             msg: 'Image uploaded successfully',
             image: imagePath
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+    }
+}
+
+exports.getTicketsByEvent = async (req, res) => {
+
+    const { uuid } = req.params;
+    const { page = 1, limit = 10, sort = 'createdAt', order = 'asc', status, email, availableTicket } = req.query;
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    try {
+        const tickets = await models.Ticket.findAndCountAll({
+            where: {
+                ...(status ? { status } : {}),
+                ...(email ? { email } : {}),
+                ...(availableTicket ? { availableTicket } : {}),
+                // availableTicket: {
+                //     [models.Sequelize.Op.in]: models.Sequelize.literal(`(
+                //         SELECT uuid FROM luistei3_campus2go.availableTickets WHERE event = '${uuid}' AND active = true
+                //     )`)
+                // }
+            },
+            include: [
+                {
+                    model: models.AvailableTicket,
+                    as: 'availableTicketDetails',
+                    where: { event: uuid },
+                    attributes: ['uuid', 'name', 'price', 'zone'],
+                    include: [
+                        {
+                            model: models.Zone,
+                            as: 'zoneDetails',
+                            attributes: ['uuid', 'name']
+                        }
+                    ]
+                },
+                {
+                    model: models.Answer,
+                    as: 'answers',
+                    attributes: [],
+                    include: [
+                        {
+                            model: models.Form,
+                            as: 'formDetails',
+                        }
+                    ]   
+                }
+            ],
+            limit: parseInt(limit),
+            offset,
+            order: [[sort, order]],
+        });
+
+        return res.status(200).json({
+            tickets: tickets.rows,
+            totalItems: tickets.count,
+            totalPages: Math.ceil(tickets.count / limit),
+            currentPage: parseInt(page),
+            itemsPerPage: parseInt(limit)
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+    }
+
+}
+
+exports.getTicketById = async (req, res) => {
+    const { uuid, ticketUuid } = req.params;
+
+    try {
+        const ticket = await models.Ticket.findOne({
+            where: {
+                uuid: ticketUuid,
+                event: uuid
+            },
+            include: [
+                {
+                    model: models.AvailableTicket,
+                    as: 'availableTicketDetails',
+                    include: [
+                        {
+                            model: models.Zone,
+                            as: 'zoneDetails',
+                        }
+                    ]
+                },
+                {
+                    model: models.Answer,
+                    as: 'answers',
+                    include: [
+                        {
+                            model: models.Form,
+                            as: 'formDetails',
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (!ticket) {
+            return res.status(404).json({ msg: 'Ticket not found' });
+        }
+
+        return res.status(200).json(ticket);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+    }
+}
+
+exports.updateTicket = async (req, res) => {
+    const { uuid, ticketUuid } = req.params;
+    const { status, email, validated, availableTicket, name } = req.body;
+
+    try {
+        const ticket = await models.Ticket.findOne({
+            where: {
+                uuid: ticketUuid,
+                event: uuid
+            }
+        });
+
+        if (!ticket) {
+            return res.status(404).json({ msg: 'Ticket not found' });
+        }
+
+        const updatedData = {
+            status,
+            email,
+            validated,
+            availableTicket,
+            name
+        };
+
+        await ticket.update(updatedData);
+
+        return res.status(200).json({
+            msg: 'Ticket updated successfully',
+            ticket
         });
     } catch (error) {
         console.error(error);

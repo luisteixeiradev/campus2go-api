@@ -11,6 +11,7 @@ const {
     param,
     body
 } = require('express-validator');
+const { route } = require('./availableTickets');
 
 router.route('/')
     .get([
@@ -35,14 +36,14 @@ router.route('/')
         body('space').notEmpty().isUUID().withMessage('Space is required and must be a valid UUID')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.createEvent)
 
-router.route('/:id')
+router.route('/:uuid')
     .get([
-        param('id').isUUID().withMessage('ID must be a valid UUID'),
+        param('uuid').isUUID().withMessage('ID must be a valid UUID'),
         query('include').optional().isString().withMessage('Includes must be a string'),
         query('availableTickets').optional().isBoolean().withMessage('availableTickets must be a boolean'),
     ], validationRoute, Controller.getEventById)
     .put([
-        param('id').isUUID().withMessage('ID must be a valid UUID'),
+        param('uuid').isUUID().withMessage('ID must be a valid UUID'),
         body('name').optional().isString().withMessage('Name must be a string'),
         body('description').optional().isString().withMessage('Description must be a string'),
         body('startDate').optional().isDate().withMessage('Start date must be a valid date'),
@@ -53,7 +54,7 @@ router.route('/:id')
         body('active').optional().isBoolean().withMessage('Active must be a boolean'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.updateEvent)
     .delete([
-        param('id').isUUID().withMessage('ID must be a valid UUID')
+        param('uuid').isUUID().withMessage('ID must be a valid UUID')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.deleteEvent);
 
 router.route('/:uuid/image')
@@ -61,8 +62,46 @@ router.route('/:uuid/image')
         param('uuid').isUUID().withMessage('UUID must be a valid UUID'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, upload.event.single('image'), Controller.uploadEventImage);
 
-router.use('/:id/available-tickets', require('./availableTickets'));
-router.use('/:id/forms', require('./forms'));
-    
+router.use('/:uuid/available-tickets', require('./availableTickets'));
+router.use('/:uuid/forms', require('./forms'));
+router.route('/:uuid/tickets')
+    .get([
+        param('uuid').isUUID().withMessage('ID must be a valid UUID'),
+        query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+        query('limit').optional().isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
+        query('sort').optional().isString().withMessage('Sort must be a string'),
+        query('order').optional().isString().withMessage('Order must be a string'),
+        query('status').optional().isString().withMessage('Status must be a string').isIn(['available', 'reserved', 'expired']),
+        query('email').optional().isEmail().withMessage('Email must be a valid email address'),
+        query('availableTicket').optional().isUUID().withMessage('ID must be a valid UUID'),
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.getTicketsByEvent)
+
+// router.route('/:uuid/tickets/export')
+//     .get([
+//         param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
+//         query('status').optional().isString().withMessage('Status must be a string').isIn(['available', 'reserved', 'expired']),
+//         query('email').optional().isEmail().withMessage('Email must be a valid email address'),
+//         query('availableTicket').optional().isUUID().withMessage('ID must be a valid UUID'),
+//     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.exportTickets);
+
+router.route('/:uuid/tickets/:ticketUuid')
+    .get([
+        param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
+        param('ticketUuid').isUUID().withMessage('Ticket ID must be a valid UUID'),
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.getTicketById)
+    .put([
+        param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
+        param('ticketUuid').isUUID().withMessage('Ticket ID must be a valid UUID'),
+        body('status').optional().isString().withMessage('Status must be a string').isIn(['available', 'reserved', 'expired']),
+        body('email').optional().isEmail().withMessage('Email must be a valid email address'),
+        body('validated').optional().isBoolean().withMessage('Validated must be a boolean'),
+        body('name').optional().isString().withMessage('Name must be a string'),
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.updateTicket)
+
+router.route('/:uuid/tickets/:ticketUuid/resend')
+    // .post([
+    //     param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
+    //     param('ticketUuid').isUUID().withMessage('Ticket ID must be a valid UUID'),
+    // ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.resendTicket);
 
 module.exports = router;

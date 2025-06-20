@@ -141,7 +141,7 @@ exports.isAvailableEvent = async (req, res, next) => {
 
     try {
 
-        const { id } = req.params;
+        const { uuid } = req.params;
 
         if (req.user.role == 'admin') {
             return next();
@@ -149,7 +149,7 @@ exports.isAvailableEvent = async (req, res, next) => {
 
         const event = await models.Event.findOne({
             where: {
-                uuid: id,
+                uuid: uuid,
                 promoter: req.promoter.uuid
             }
         });
