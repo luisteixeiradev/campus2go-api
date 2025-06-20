@@ -3,7 +3,7 @@ const models = require('../models');
 
 exports.generateToken = async (data, type) => {
 
-    if (type !== 'auth' && type !== 'active' && type !== 'forgotPassword' && type !== 'session' && type !== 'purchase') {
+    if (type !== 'auth' && type !== 'active' && type !== 'forgotPassword' && type !== 'session' && type !== 'purchase' && type !== 'validator') {
         throw new Error('Invalid token type');
     }
 

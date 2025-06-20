@@ -11,7 +11,6 @@ const {
     param,
     body
 } = require('express-validator');
-const { route } = require('./availableTickets');
 
 router.route('/')
     .get([
@@ -103,5 +102,7 @@ router.route('/:uuid/tickets/:ticketUuid/resend')
     //     param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
     //     param('ticketUuid').isUUID().withMessage('Ticket ID must be a valid UUID'),
     // ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.resendTicket);
+
+router.use('/:uuid/validators', require('./validators'));
 
 module.exports = router;

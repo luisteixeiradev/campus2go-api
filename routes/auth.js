@@ -14,8 +14,7 @@ router.route('/')
     .post([
         body('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Email is invalid'),
         body('password').notEmpty().withMessage('Password is required')
-    ], Controller.authenticate
-    )
+    ], Controller.authenticate)
 
 router.route('/register')
     .post([
@@ -46,4 +45,8 @@ router.route('/change-password')
         body('newPassword').notEmpty().withMessage('New password is required')
     ], auth.auth, validationRoute, Controller.changePassword)
 
+router.route('/validator')
+    .post([
+        body('code').optional().isString().withMessage('Code must be a string')
+    ], validationRoute, Controller.authenticateValidator);
 module.exports = router;

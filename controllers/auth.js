@@ -217,3 +217,56 @@ exports.changePassword = async (req, res) => {
     }
 
 }
+
+exports.authenticateValidator = async (req, res) => {
+
+    try {
+
+        const { code } = req.body;
+
+        const validator = await models.Validator.findOne({
+            where: {
+                code,
+                active: true
+            },
+            include: [{
+                model: models.Event,
+                as: 'eventDetails',
+                where: {
+                    startDate: {
+                        [models.Sequelize.Op.lte]: new Date()
+                    }
+                },
+                attributes: [],
+            }]
+        });
+
+        if (!validator) {
+            return res.status(400).send({
+                msg: "validator not found"
+            });
+        }
+
+        validator.device = {
+            ip: req.ip,
+            userAgent: req.headers['user-agent']
+        }
+        validator.registeredAt = new Date();
+
+        await validator.save();
+
+        const tokenGenerated = await token.generateToken(validator, "validator");
+
+        return res.status(200).send({
+            token: tokenGenerated
+        });
+
+    } catch (error) {
+        console.log(error);
+        
+        return res.status(500).send({
+            error: "error when authenticating validator"
+        });
+    }
+
+}

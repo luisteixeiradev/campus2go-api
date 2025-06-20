@@ -445,3 +445,4 @@ exports.updateTicket = async (req, res) => {
         return res.status(500).json({ msg: 'Internal server error' });
     }
 }
+

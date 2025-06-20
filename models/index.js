@@ -16,8 +16,9 @@ const Purchase = require("./purchase")(sequelize, DataTypes);
 const Answer = require("./answer")(sequelize, DataTypes);
 const Payment = require("./payment")(sequelize, DataTypes);
 // const Session = require("./session")(sequelize, DataTypes);
+const Validator = require("./validator")(sequelize, DataTypes);
 
-const models = { User, Promoter, UsersHasPromoters, Space, Zone, Event, AvailableTicket, Form, Ticket, Purchase, Answer, Payment };
+const models = { User, Promoter, UsersHasPromoters, Space, Zone, Event, AvailableTicket, Form, Ticket, Purchase, Answer, Payment, Validator };
 
 Object.keys(models).forEach((modelName) => {
     if (models[modelName].associate) {
