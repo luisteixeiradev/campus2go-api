@@ -143,7 +143,7 @@ exports.getEventById = async (req, res) => {
             return res.status(404).json({ msg: 'Event not found' });
         }
 
-        return res.status(200).json(event);
+        return res.status(200).json({event});
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: 'Internal server error' });
@@ -444,3 +444,8 @@ exports.updateTicket = async (req, res) => {
     }
 }
 
+exports.getEventStatistics = async (req, res) => {
+
+    
+
+}
