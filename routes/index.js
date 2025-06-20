@@ -11,5 +11,6 @@ router.use('/events', require('./events'));
 router.use('/sessions', require('./sessions'));
 // router.use('/tickets', require('./tickets'));
 router.use('/purchases', require('./purchases'));
+router.use('/tickets', require('./tickets'));
 
 module.exports = router;

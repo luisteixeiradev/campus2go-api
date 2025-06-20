@@ -87,3 +87,28 @@ exports.getPromoterFromUser = async (user) => {
     return promoters[0];
 
 }
+
+exports.getValidatorFromToken = async (token, req) => {
+
+    try {
+        const decoded = await this.decodeToken(token);       
+
+        if (decoded.type !== 'validator') {
+            throw new Error('Invalid token type');
+        }
+
+        const validator = await models.Validator.findOne({
+            where: {
+                uuid: decoded.uuid,
+                active: true
+            }
+        });
+
+        return validator;
+
+    } catch (error) {
+        console.error("Error in getValidatorFromToken:", error);
+        return { error: 'Invalid token' }
+    }
+
+}

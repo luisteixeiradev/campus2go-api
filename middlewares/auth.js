@@ -205,3 +205,37 @@ exports.validateSession = async (req, res, next) => {
         return res.status(401).json({ error: 'Invalid token session' });
     }
 }
+
+exports.isValidator = async (req, res, next) => {
+
+    try {
+
+        const tokenValidator = req.headers['authorization']?.split(' ')[1];
+
+        if (!tokenValidator) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+
+        const validator = await token.getValidatorFromToken(tokenValidator, req);
+
+
+        if (!validator) {
+            return res.status(401).json({ error: 'Validator not found or inactive' });
+        }
+
+        if (validator.device.ip !== req.ip || validator.device.userAgent !== req.headers['user-agent']) {
+            return res.status(401).json({ error: 'Device not authorized' });
+        }
+
+        validator.lastAccess = new Date();
+        await validator.save();
+
+        req.validator = validator;
+        next();
+
+    } catch (error) {
+
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+
+}

@@ -1,6 +1,4 @@
 const models = require('../models');
-const availableTicket = require('../models/availableTicket');
-const promoter = require('../models/promoter');
 
 exports.getAllEvents = async (req, res) => {
 

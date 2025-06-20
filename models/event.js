@@ -75,12 +75,6 @@ module.exports = (sequelize, DataTypes) => {
             as: 'forms'
         });
 
-        Event.hasMany(models.Ticket, {
-            foreignKey: 'event',
-            sourceKey: 'uuid',
-            as: 'tickets'
-        });
-
         Event.hasMany(models.Validator, {
             foreignKey: 'event',
             sourceKey: 'uuid',
