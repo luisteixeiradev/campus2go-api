@@ -2,6 +2,7 @@ const models = require('../models');
 const bcrypt = require('bcryptjs');
 const { Op } = require('sequelize');
 const sendEmails = require('../utils/sendEmails');
+const e = require('express');
 
 exports.getAllUsers = async (req, res) => {
 
@@ -131,6 +132,34 @@ exports.getUserById = async (req, res) => {
         });
     }
 }
+
+exports.getMe = async (req, res) => {
+    try {
+        const user = await models.User.findOne({
+            where: {
+                uuid: req.user.uuid
+            },
+            attributes: {
+                exclude: ['password', 'createdAt', 'updatedAt']
+            }
+         });
+
+        if (!user) {
+            return res.status(400).send({
+                error: "user not found"
+            });
+        }
+
+        return res.status(200).send({user});
+    } catch (error) {
+        console.log(error);
+        
+        return res.status(500).send({
+            error: "error when getting user"
+        });
+    }
+}
+
 exports.updateUser = async (req, res) => {
     try {
         const { uuid } = req.params;

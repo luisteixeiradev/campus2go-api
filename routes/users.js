@@ -29,6 +29,7 @@ router.route('/')
     // ], validationRoute, Controller.createUser)
 
 router.route('/me')
+    .get(auth.auth, Controller.getMe)
     .put([
         body('name').optional().isString().withMessage('Name is invalid'),
         body('email').optional().isEmail().withMessage('Email is invalid'),
