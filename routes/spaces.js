@@ -32,7 +32,8 @@ router.route('/')
 
 router.route('/:id')
     .get([
-        param('id').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID')
+        param('id').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID'),
+        query('include').optional().isString().withMessage('Includes must be a string')
     ], validationRoute, Controller.getSpaceById)
     .put([
         body('name').optional().isString().withMessage('Name must be a string'),
