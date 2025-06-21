@@ -68,7 +68,7 @@ exports.getAllSpaces = async (req, res) => {
             order: [['name', 'ASC']]
         });
 
-        return res.status(200).send(spaces);
+        return res.status(200).send({spaces});
     } catch (error) {
         console.log(error);
 
