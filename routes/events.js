@@ -28,9 +28,9 @@ router.route('/')
     .post([
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
         body('description').optional().isString().withMessage('Description must be a string'),
-        body('startDate').notEmpty().isString().withMessage('Start date is required and must be a valid date'),
-        body('endDate').notEmpty().isString().withMessage('End date is required and must be a valid date'),
-        body('image').optional().isURL().withMessage('Image must be a valid URL'),
+        body('startDate').notEmpty().isISO8601().withMessage('Start date is required and must be a valid date'),
+        body('endDate').notEmpty().isISO8601().withMessage('End date is required and must be a valid date'),
+        body('image').optional().isString().withMessage('Image must be a valid URL'),
         body('promoter').optional().isUUID().withMessage('Promoter is required and must be a valid UUID'),
         body('space').notEmpty().isUUID().withMessage('Space is required and must be a valid UUID')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.createEvent)
@@ -45,9 +45,9 @@ router.route('/:uuid')
         param('uuid').isUUID().withMessage('ID must be a valid UUID'),
         body('name').optional().isString().withMessage('Name must be a string'),
         body('description').optional().isString().withMessage('Description must be a string'),
-        body('startDate').optional().isDate().withMessage('Start date must be a valid date'),
-        body('endDate').optional().isDate().withMessage('End date must be a valid date'),
-        body('image').optional().isURL().withMessage('Image must be a valid URL'),
+        body('startDate').optional().isISO8601().withMessage('Start date must be a valid date'),
+        body('endDate').optional().isISO8601().withMessage('End date must be a valid date'),
+        body('image').optional().isString().withMessage('Image must be a valid URL'),
         body('promoter').optional().isUUID().withMessage('Promoter must be a valid UUID'),
         body('space').optional().isUUID().withMessage('Space must be a valid UUID'),
         body('active').optional().isBoolean().withMessage('Active must be a boolean'),
