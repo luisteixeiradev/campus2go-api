@@ -36,13 +36,14 @@ exports.getAllValidators = async (req, res) => {
 
 exports.createValidator = async (req, res) => {
     const { uuid } = req.params;
-    const { name } = req.body;
+    const { name, code } = req.body;
 
     try {
 
         const validator = await models.Validator.create({
             name,
             event: uuid,
+            code
         });
 
         return res.status(201).json({

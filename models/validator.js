@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 const { v7 } = uuid;
-const { customAlphabet } = require('nanoid');
+const { customAlphabet, urlAlphabet, random } = require('nanoid');
 
 module.exports = (sequelize, DataTypes) => {
     const Validator = sequelize.define('Validator', {
@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         code: {
             type: DataTypes.STRING,
-            defaultValue: () => customAlphabet('1234567890', 8)(),
-            allowNull: true,
+            defaultValue: () => customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 8)(),
+            allowNull: false,
             unique: false
         },
         event: {
