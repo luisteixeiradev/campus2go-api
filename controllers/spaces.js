@@ -42,18 +42,17 @@ exports.getAllSpaces = async (req, res) => {
                         model: models.Zone,
                         as: 'zones',
                         attributes: ['uuid', 'name', 'capacity'],
-                        required: false
                     });
                 }
 
-                if (inc === 'promoter' && user.role === 'admin') {
+                if (inc === 'ptomoter' && req.user.role === 'admin') {
                     includeArray.push({
                         model: models.Promoter,
-                        as: 'promoter',
-                        attributes: ['uuid', 'name'],
-                        required: false
+                        as: 'promoterDetails',
+                        attributes: ['uuid', 'name', 'email'],
                     });
                 }
+                
             });
         }
 

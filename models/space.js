@@ -53,7 +53,8 @@ module.exports = (sequelize, DataTypes) => {
     Space.associate = (models) => {
         Space.belongsTo(models.Promoter, {
             foreignKey: 'promoter',
-            targetKey: 'uuid'
+            targetKey: 'uuid',
+            as: 'promoterDetails'
         });
 
         Space.hasMany(models.Zone, {
