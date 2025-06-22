@@ -112,7 +112,7 @@ exports.isAvailableSpace = async (req, res, next) => {
 
     try {
 
-        const { id } = req.params;
+        const { uuid } = req.params;
 
         if (req.user.role == 'admin') {
             return next();
@@ -120,7 +120,7 @@ exports.isAvailableSpace = async (req, res, next) => {
 
         const space = models.Space.findOne({
             where: {
-                uuid: id,
+                uuid: uuid,
                 promoter: req.promoter.uuid
             }
         })
