@@ -267,7 +267,7 @@ exports.uploadMapSpace = async (req, res) => {
             });
         }
 
-        const imagePath = `/images/maps/${req.file.filename}`;
+        const imagePath = `/images/spaces/${req.file.filename}`;
 
         await space.update({
             map: imagePath
