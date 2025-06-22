@@ -100,7 +100,7 @@ exports.getAllSpaces = async (req, res) => {
             totalPages: Math.ceil(spaces.count / limit),
             currentPage: parseInt(page),
             itemsPerPage: parseInt(limit)
-         });
+        });
     } catch (error) {
         console.log(error);
 
@@ -243,4 +243,46 @@ exports.updateSpace = async (req, res) => {
             error: "error when updating space"
         });
     }
+}
+
+exports.uploadMapSpace = async (req, res) => {
+    const { uuid } = req.params;
+    try {
+
+        const space = await models.Space.findOne({
+            where: {
+                uuid: uuid
+            }
+        });
+
+        if (!space) {
+            return res.status(404).send({
+                error: "space not found"
+            });
+        }
+
+        if (!req.file) {
+            return res.status(400).send({
+                msg: "No file uploaded"
+            });
+        }
+
+        const imagePath = `/images/maps/${req.file.filename}`;
+
+        await space.update({
+            map: imagePath
+        });
+
+        return res.status(200).send({
+            msg: "Map uploaded successfully",
+            map: imagePath
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+
+    }
+
+
 }

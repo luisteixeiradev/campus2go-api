@@ -4,6 +4,7 @@ const Controller = require('../controllers/spaces');
 const validationRoute = require('../middlewares/validationRoute');
 const auth = require('../middlewares/auth');
 const token = require('../utils/token');
+const upload = require('../middlewares/upload');
 
 const {
     query,
@@ -47,6 +48,10 @@ router.route('/:uuid')
         body('public').optional().isBoolean().withMessage('Public must be a boolean')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.updateSpace)
 
+router.route('/:uuid/map')
+    .put([
+        param('uuid').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID'),    
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, upload.space.single('map'), Controller.uploadMapSpace);
 
 router.use('/:uuid/zones', require('./zones'));
 

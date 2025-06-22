@@ -30,3 +30,5 @@ const imageFileFilter = (req, file, cb) => {
 exports.promoter = multer({storage: createStorage('promoters'), fileFilter: imageFileFilter})
 
 exports.event = multer({storage: createStorage('events'), fileFilter: imageFileFilter})
+
+exports.space = multer({storage: createStorage('spaces'), fileFilter: imageFileFilter})
