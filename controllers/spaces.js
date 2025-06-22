@@ -45,7 +45,7 @@ exports.getAllSpaces = async (req, res) => {
                     });
                 }
 
-                if (inc === 'ptomoter' && req.user.role === 'admin') {
+                if (inc === 'promoter' && req.user.role === 'admin') {
                     includeArray.push({
                         model: models.Promoter,
                         as: 'promoterDetails',
