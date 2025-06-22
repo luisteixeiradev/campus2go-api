@@ -18,6 +18,8 @@ router.route('/')
         // query('public').optional().isBoolean().withMessage('Public must be a boolean'),
         query('name').optional().isString().withMessage('Name must be a string'),
         query('include').optional().isString().withMessage('Includes must be a string'),
+        query('minCapacity').optional().isInt({ min: 0 }).withMessage('Min capacity must be a non-negative integer'),
+        query('maxCapacity').optional().isInt({ min: 0 }).withMessage('Max capacity must be a non-negative integer'),
     ], validationRoute, auth.ifUSer, Controller.getAllSpaces)
     .post([
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),

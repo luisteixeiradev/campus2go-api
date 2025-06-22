@@ -5,7 +5,7 @@ const { Op, or } = require('sequelize');
 exports.getAllSpaces = async (req, res) => {
 
     try {
-        const { page = 1, limit = 10, public: isPublic = undefined, name, include } = req.query;
+        const { page = 1, limit = 10, public: isPublic = undefined, name, include, minCapacity, maxCapacity } = req.query;
         const { user } = req;
 
         const query = {
@@ -42,6 +42,7 @@ exports.getAllSpaces = async (req, res) => {
                         model: models.Zone,
                         as: 'zones',
                         attributes: ['uuid', 'name', 'capacity'],
+                        required: false,
                     });
                 }
 
@@ -52,8 +53,29 @@ exports.getAllSpaces = async (req, res) => {
                         attributes: ['uuid', 'name', 'email'],
                     });
                 }
-                
+
             });
+        }
+
+        const min = minCapacity ? Number(minCapacity) : undefined;
+        const max = maxCapacity ? Number(maxCapacity) : undefined;
+        let totalCapacityCondition = '';
+
+        if (min !== undefined && max !== undefined) {
+            totalCapacityCondition = `
+                (SELECT COALESCE(SUM(capacity), 0) FROM zones WHERE zones.space = Space.uuid) BETWEEN ${min} AND ${max}
+            `;
+        } else if (min !== undefined) {
+            totalCapacityCondition = `
+                (SELECT COALESCE(SUM(capacity), 0) FROM zones WHERE zones.space = Space.uuid) >= ${min}
+            `;
+        } else if (max !== undefined) {
+            totalCapacityCondition = `
+                (SELECT COALESCE(SUM(capacity), 0) FROM zones WHERE zones.space = Space.uuid) <= ${max}
+            `;
+        }
+        if (totalCapacityCondition) {
+            query.where[Op.and] = models.Sequelize.literal(totalCapacityCondition);
         }
 
         const spaces = await models.Space.findAll({
@@ -63,20 +85,16 @@ exports.getAllSpaces = async (req, res) => {
             attributes: {
                 include: [
                     [
-                        models.Sequelize.literal(`(
-                      SELECT CAST(SUM(capacity) AS UNSIGNED)
-                      FROM zones
-                      WHERE zones.space = Space.uuid
-                    )`),
+                        models.Sequelize.literal(`(SELECT COALESCE(SUM(capacity), 0) FROM zones WHERE zones.space = Space.uuid) `),
                         'totalCapacity'
                     ]
                 ]
             },
             include: includeArray,
-            order: [['name', 'ASC']]
+            order: [['name', 'ASC']],
         });
 
-        return res.status(200).send({spaces});
+        return res.status(200).send({ spaces });
     } catch (error) {
         console.log(error);
 
