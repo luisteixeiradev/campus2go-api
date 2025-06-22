@@ -45,6 +45,15 @@ exports.getAllSpaces = async (req, res) => {
                         required: false
                     });
                 }
+
+                if (inc === 'promoter' && user.role === 'admin') {
+                    includeArray.push({
+                        model: models.Promoter,
+                        as: 'promoter',
+                        attributes: ['uuid', 'name'],
+                        required: false
+                    });
+                }
             });
         }
 
