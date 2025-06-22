@@ -2,12 +2,12 @@ const models = require('../models');
 
 exports.getAllZones = async (req, res) => {
 
-    const { id } = req.params;
+    const { uuid } = req.params;
 
     try {
         const zones = await models.Zone.findAll({
             where: {
-                space: id
+                space: uuid
             },
         });
 
@@ -27,15 +27,15 @@ exports.getAllZones = async (req, res) => {
 exports.createZone = async (req, res) => {
     try {
 
-        const { id } = req.params;
-        console.log(id);
+        const { uuid } = req.params;
+        console.log(uuid);
 
         const { name, capacity } = req.body;
 
         const zone = await models.Zone.create({
             name,
             capacity,
-            space: id
+            space: uuid
         });
 
         return res.status(201).send({
@@ -52,13 +52,13 @@ exports.createZone = async (req, res) => {
 }
 
 exports.getZoneById = async (req, res) => {
-    const { idZone, id } = req.params;
+    const { uuidZone, uuid } = req.params;
 
     try {
         const zone = await models.Zone.findOne({
             where: {
-                uuid: idZone,
-                space: id
+                uuid: uuidZone,
+                space: uuid
             },
         });
 
@@ -75,14 +75,14 @@ exports.getZoneById = async (req, res) => {
 
 exports.updateZone = async (req, res) => {
 
-    const { idZone, id } = req.params;
+    const { uuidZone, uuid } = req.params;
     const { name, capacity } = req.body;
 
     try {
         const zone = await models.Zone.findOne({
             where: {
-                uuid: idZone,
-                space: id
+                uuid: uuidZone,
+                space: uuid
             },
         });
 

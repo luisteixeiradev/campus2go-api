@@ -108,7 +108,7 @@ exports.getAllSpaces = async (req, res) => {
 exports.getSpaceById = async (req, res) => {
 
     try {
-        const { id } = req.params;
+        const { uuid } = req.params;
         const { include } = req.query;
 
         const includeArray = [];
@@ -130,7 +130,7 @@ exports.getSpaceById = async (req, res) => {
 
         const space = await models.Space.findOne({
             where: {
-                uuid: id
+                uuid: uuid
             },
             attributes: {
                 include: [
@@ -194,12 +194,12 @@ exports.createSpace = async (req, res) => {
 
 exports.updateSpace = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { uuid } = req.params;
         const { name, address, map, public } = req.body;
 
         const space = await models.Space.findOne({
             where: {
-                uuid: id,
+                uuid: uuid,
                 promoter: req.user.role === "promoter" ? req.promoter.uuid : null
             }
         });
@@ -216,7 +216,7 @@ exports.updateSpace = async (req, res) => {
             map
         }
 
-        res.user.role = "admin" ? json['public'] = public : json['public'] = space.public;
+        req.user.role == "admin" ? json['public'] = public : json['public'] = space.public;
 
         await space.update({
             json

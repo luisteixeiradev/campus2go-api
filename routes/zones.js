@@ -18,12 +18,12 @@ router.route('/')
         // body('description').optional().isString().withMessage('Description must be a string'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.createZone) //Vereficar se o usuario é admin ou promoter
 
-router.route('/:idZone')
+router.route('/:uuidZone')
     .get([
-        param('idZone').notEmpty().isUUID().withMessage('ID is required and must be a valid UUID'),
+        param('uuidZone').notEmpty().isUUID().withMessage('ID is required and must be a valid UUID'),
     ], validationRoute, Controller.getZoneById)
     .put([
-        param('idZone').notEmpty().isUUID().withMessage('ID is required and must be a valid UUID'),
+        param('uuidZone').notEmpty().isUUID().withMessage('ID is required and must be a valid UUID'),
         body('name').optional().isString().withMessage('Name must be a string'),
         body('capacity').optional().isInt({ min: 1 }).withMessage('Capacity must be a positive integer'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.updateZone)

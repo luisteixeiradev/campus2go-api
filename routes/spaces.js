@@ -32,9 +32,9 @@ router.route('/')
         body('public').optional().isBoolean().withMessage('Public must be a boolean') 
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.createSpace) //Vereficar se o usuario é admin ou promoter
 
-router.route('/:id')
+router.route('/:uuid')
     .get([
-        param('id').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID'),
+        param('uuid').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID'),
         query('include').optional().isString().withMessage('Includes must be a string')
     ], validationRoute, Controller.getSpaceById)
     .put([
@@ -48,6 +48,6 @@ router.route('/:id')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.updateSpace) //Vereficar se o usuario é admin ou promoter
 
 
-router.use('/:id/zones', require('./zones'));
+router.use('/:uuid/zones', require('./zones'));
 
 module.exports = router;
