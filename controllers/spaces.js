@@ -78,7 +78,7 @@ exports.getAllSpaces = async (req, res) => {
             query.where[Op.and] = models.Sequelize.literal(totalCapacityCondition);
         }
 
-        const spaces = await models.Space.findAll({
+        const spaces = await models.Space.findAndCountAll({
             ...query,
             limit: parseInt(limit),
             offset: (parseInt(page) - 1) * parseInt(limit),
@@ -94,7 +94,13 @@ exports.getAllSpaces = async (req, res) => {
             order: [['name', 'ASC']],
         });
 
-        return res.status(200).send({ spaces });
+        return res.status(200).send({
+            spaces: spaces.rows,
+            totalItems: spaces.count,
+            totalPages: Math.ceil(spaces.count / limit),
+            currentPage: parseInt(page),
+            itemsPerPage: parseInt(limit)
+         });
     } catch (error) {
         console.log(error);
 
