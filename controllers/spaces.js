@@ -197,11 +197,16 @@ exports.updateSpace = async (req, res) => {
         const { uuid } = req.params;
         const { name, address, map, public } = req.body;
 
+        const whereCondition = {
+            uuid: uuid
+        };
+
+        if (req.user.role == "promoter") {
+            whereCondition.promoter = req.promoter.uuid;
+        }
+
         const space = await models.Space.findOne({
-            where: {
-                uuid: uuid,
-                promoter: req.user.role === "promoter" ? req.promoter.uuid : null
-            }
+            where: whereCondition
         });
 
         if (!space) {
@@ -218,9 +223,9 @@ exports.updateSpace = async (req, res) => {
 
         req.user.role == "admin" ? json['public'] = public : json['public'] = space.public;
 
-        await space.update({
+        await space.update(
             json
-        });
+        );
 
         return res.status(200).send({
             msg: "space updated"

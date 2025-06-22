@@ -30,7 +30,7 @@ router.route('/')
         body('address.country').notEmpty().isString().withMessage('Country is required and must be a string'),
         body('map').optional().isURL().withMessage('Map is required and must be a valid URL'),
         body('public').optional().isBoolean().withMessage('Public must be a boolean') 
-    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.createSpace) //Vereficar se o usuario é admin ou promoter
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.createSpace)
 
 router.route('/:uuid')
     .get([
@@ -45,7 +45,7 @@ router.route('/:uuid')
         body('address.zip').optional().isString().withMessage('Zip must be a string'),
         body('address.country').optional().isString().withMessage('Country must be a string'),
         body('public').optional().isBoolean().withMessage('Public must be a boolean')
-    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.updateSpace) //Vereficar se o usuario é admin ou promoter
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.updateSpace)
 
 
 router.use('/:uuid/zones', require('./zones'));
