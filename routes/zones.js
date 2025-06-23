@@ -15,6 +15,7 @@ router.route('/')
     .post([
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
         body('capacity').notEmpty().isInt({ min: 1 }).withMessage('Capacity is required and must be a positive integer'),
+        body('active').optional().isBoolean().withMessage('Active must be a boolean'),
         // body('description').optional().isString().withMessage('Description must be a string'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.createZone) //Vereficar se o usuario é admin ou promoter
 
@@ -26,6 +27,7 @@ router.route('/:uuidZone')
         param('uuidZone').notEmpty().isUUID().withMessage('ID is required and must be a valid UUID'),
         body('name').optional().isString().withMessage('Name must be a string'),
         body('capacity').optional().isInt({ min: 1 }).withMessage('Capacity must be a positive integer'),
+        body('active').optional().isBoolean().withMessage('Active must be a boolean'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.updateZone)
     // .delete([
     //     param('idZone').notEmpty().isUUID().withMessage('ID is required and must be a valid UUID'),

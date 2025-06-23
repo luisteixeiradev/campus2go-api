@@ -30,12 +30,13 @@ exports.createZone = async (req, res) => {
         const { uuid } = req.params;
         console.log(uuid);
 
-        const { name, capacity } = req.body;
+        const { name, capacity, active } = req.body;
 
         const zone = await models.Zone.create({
             name,
             capacity,
-            space: uuid
+            active,
+            space: uuid,
         });
 
         return res.status(201).send({
@@ -76,13 +77,14 @@ exports.getZoneById = async (req, res) => {
 exports.updateZone = async (req, res) => {
 
     const { uuidZone, uuid } = req.params;
-    const { name, capacity } = req.body;
+    const { name, capacity, active } = req.body;
 
     try {
         const zone = await models.Zone.findOne({
             where: {
                 uuid: uuidZone,
-                space: uuid
+                space: uuid,
+                active
             },
         });
 
