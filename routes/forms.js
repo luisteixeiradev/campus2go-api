@@ -51,7 +51,7 @@ router.route('/bulk')
         body('forms.*.order').optional().isInt({ min: 0 }).withMessage('Order must be a non-negative integer')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.bulkUpdateForms);
 
-router.route('/:formId')
+router.route('/:formUuid')
     .get([
         param('formId').isUUID().withMessage('Form ID must be a valid UUID')
     ], validationRoute, Controller.getFormById)

@@ -3,11 +3,11 @@ const event = require('../models/event');
 
 exports.getAllForms = async (req, res) => {
 
-    const { id } = req.params;
+    const { uuid } = req.params;
 
     try {
         const forms = await models.Form.findAll({
-            where: { event: id },
+            where: { event: uuid },
             order: [["order", "asc"]]
         });    
 
@@ -26,7 +26,7 @@ exports.getAllForms = async (req, res) => {
 exports.createForm = async (req, res) => {
 
     const { question, type, required = false, options, order = 0 } = req.body;
-    const { id } = req.params;
+    const { uuid } = req.params;
 
     try {
         const form = await models.Form.create({
@@ -34,7 +34,7 @@ exports.createForm = async (req, res) => {
             type,
             required,
             options: options ? options : null,
-            event: id,
+            event: uuid,
             order
         });
 
@@ -87,14 +87,14 @@ exports.createForm = async (req, res) => {
 exports.bulkUpdateForms = async (req, res) => {
 
     const { forms } = req.body;
-    const { id } = req.params;
+    const { uuid } = req.params;
 
     try {
         const updatedForms = await models.Form.bulkCreate(
             forms,
             {
                 updateOnDuplicate: ['question', 'type', 'required', 'options', 'order'],
-                where: { event: id }
+                where: { event: uuid }
             }
         )
 
@@ -113,11 +113,11 @@ exports.bulkUpdateForms = async (req, res) => {
 
 exports.getFormById = async (req, res) => {
 
-    const { formId, id } = req.params;
+    const { formId, formUuid } = req.params;
 
     try {
         const form = await models.Form.findOne({
-            where: { uuid: formId, event: id },
+            where: { uuid: formId, event: formUuid },
         });
 
         if (!form) {
@@ -136,12 +136,12 @@ exports.getFormById = async (req, res) => {
 
 exports.updateForm = async (req, res) => {
 
-    const { formId, id } = req.params;
+    const { formId, formUuid } = req.params;
     const { question, type, required, options, order } = req.body;
 
     try {
         const form = await models.Form.findOne({
-            where: { uuid: formId, event: id },
+            where: { uuid: formId, event: formUuid },
         });
 
         if (!form) {
@@ -170,11 +170,11 @@ exports.updateForm = async (req, res) => {
 }
 exports.deleteForm = async (req, res) => {
 
-    const { formId } = req.params;
+    const { formUuid } = req.params;
 
     try {
         const form = await models.Form.findOne({
-            where: { uuid: formId },
+            where: { uuid: formUuid },
         });
 
         if (!form) {
