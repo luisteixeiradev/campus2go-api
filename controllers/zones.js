@@ -3,12 +3,32 @@ const models = require('../models');
 exports.getAllZones = async (req, res) => {
 
     const { uuid } = req.params;
+    const { include } = req.query;
+
+    const includeArray = [];
+
+    if (include) {
+        const includes = include.split(',');
+
+        includes.forEach((inc) => {
+            if (inc === 'space') {
+                includeArray.push({
+                    model: models.Space,
+                    as: 'spaceDetails',
+                    required: false
+                });
+            }
+        });
+
+    }
+
 
     try {
         const zones = await models.Zone.findAll({
             where: {
                 space: uuid
             },
+            include: includeArray,
         });
 
         return res.status(200).send({
@@ -67,7 +87,7 @@ exports.getZoneById = async (req, res) => {
             return res.status(404).json({ msg: 'Zone not found' });
         }
 
-        return res.status(200).json({zone});
+        return res.status(200).json({ zone });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: 'Internal server error' });

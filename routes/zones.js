@@ -11,7 +11,10 @@ const {
 } = require('express-validator');
 
 router.route('/')
-    .get(validationRoute, Controller.getAllZones)
+    .get([
+        param('uuid').notEmpty().isUUID().withMessage('Space ID is required and must be a valid UUID'),
+        query('include').optional().isString().withMessage('Includes must be a string'),
+    ],validationRoute, Controller.getAllZones)
     .post([
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
         body('capacity').optional({ nullable: true }).isInt({ min: 1 }).withMessage('Capacity is required and must be a positive integer'),

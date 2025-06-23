@@ -35,7 +35,8 @@ module.exports = (sequelize, DataTypes) => {
     Zone.associate = (models) => {
         Zone.belongsTo(models.Space, {
             foreignKey: 'space',
-            targetKey: 'uuid'
+            targetKey: 'uuid',
+            as: 'spaceDetails'
         });
 
         Zone.hasMany(models.AvailableTicket, {
