@@ -118,12 +118,13 @@ exports.isAvailableSpace = async (req, res, next) => {
             return next();
         }
 
-        const space = models.Space.findOne({
+        const space = await models.Space.findOne({
             where: {
                 uuid: uuid,
                 promoter: req.promoter.uuid
             }
         })
+        
 
         if (!space) {
             return res.status(401).json({ error: 'Forbidden' });
