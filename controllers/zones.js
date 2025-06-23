@@ -104,3 +104,27 @@ exports.updateZone = async (req, res) => {
     }
 
 }
+
+exports.deleteZone = async (req, res) => {
+    const { uuidZone, uuid } = req.params;
+
+    try {
+        const zone = await models.Zone.findOne({
+            where: {
+                uuid: uuidZone,
+                space: uuid
+            },
+        });
+
+        if (!zone) {
+            return res.status(404).json({ msg: 'Zone not found' });
+        }
+
+        await zone.destroy();
+
+        return res.status(200).json({ msg: 'Zone deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+    }
+}

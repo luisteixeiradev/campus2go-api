@@ -29,9 +29,9 @@ router.route('/:uuidZone')
         body('capacity').optional({ nullable: true }).isInt({ min: 1 }).withMessage('Capacity must be a positive integer'),
         body('active').optional().isBoolean().withMessage('Active must be a boolean'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.updateZone)
-    // .delete([
-    //     param('idZone').notEmpty().isUUID().withMessage('ID is required and must be a valid UUID'),
-    // ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.deleteZone);
+    .delete([
+        param('uuidZone').notEmpty().isUUID().withMessage('ID is required and must be a valid UUID'),
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableSpace, Controller.deleteZone);
 
 
 module.exports = router;
