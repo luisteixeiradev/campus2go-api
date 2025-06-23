@@ -79,12 +79,16 @@ exports.updateZone = async (req, res) => {
     const { uuidZone, uuid } = req.params;
     const { name, capacity, active } = req.body;
 
+    const whereCondition = {
+        uuid: uuidZone,
+        space: uuid,
+    };
+
     try {
         const zone = await models.Zone.findOne({
             where: {
                 uuid: uuidZone,
                 space: uuid,
-                active
             },
         });
 
@@ -94,6 +98,7 @@ exports.updateZone = async (req, res) => {
 
         zone.name = name || zone.name;
         zone.capacity = capacity || zone.capacity;
+        zone.active = active !== undefined ? active : zone.active;
 
         await zone.save();
 
