@@ -1,4 +1,5 @@
 const models = require('../models');
+const availableTicket = require('../models/availableTicket');
 
 exports.getAllAvailableTickets = async (req, res) => {
     try {
@@ -21,7 +22,7 @@ exports.getAllAvailableTickets = async (req, res) => {
         }
 
         const whereClause = {
-            event: req.params.id,
+            event: req.params.uuid,
         }
 
         // If active is provided, add it to the where clause
@@ -32,7 +33,18 @@ exports.getAllAvailableTickets = async (req, res) => {
         // Fetching available tickets with pagination and includes
         const availableTickets = await models.AvailableTicket.findAll({
             where: whereClause,
-            include: includeArray
+            include: includeArray,
+            attributes: {
+                include: [
+                    [
+                        models.Sequelize.literal(`(
+                        SELECT COUNT(*) FROM tickets AS t WHERE t.availableTicket = AvailableTickets.uuid AND t.status IN ('reserved', 'available')
+                        )`),
+                        'sold'
+                    ]
+                ]
+            },
+            order: [['name', 'ASC']]
         });
 
         return res.status(200).json({
@@ -136,7 +148,7 @@ exports.getAvailableTicketById = async (req, res) => {
             return res.status(404).json({ msg: 'Available ticket not found' });
         }
 
-        return res.status(200).json({availableTicket});
+        return res.status(200).json({ availableTicket });
     } catch (error) {
         console.error(error);
         return res.status(500).send({
@@ -177,7 +189,7 @@ exports.updateAvailableTicket = async (req, res) => {
 
 exports.deleteAvailableTicket = async (req, res) => {
     try {
-        const { uuidAvailableTicket } = req.params; 
+        const { uuidAvailableTicket } = req.params;
 
         const availableTicket = await models.AvailableTicket.findOne({
             where: {
@@ -196,12 +208,12 @@ exports.deleteAvailableTicket = async (req, res) => {
             return res.status(404).json({ error: 'Available ticket not found' });
         }
 
-        
+
         if (availableTicket.tickets.length > 0) {
             return res.status(400).json({ error: 'Cannot delete available ticket with associated tickets' });
         }
 
-        
+
         await availableTicket.destroy();
 
         return res.status(200).json({ msg: 'Available ticket deleted successfully' });

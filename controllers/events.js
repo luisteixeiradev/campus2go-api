@@ -299,6 +299,9 @@ exports.uploadEventImage = async (req, res) => {
     }
 }
 
+
+// Tickets of event
+
 exports.getTicketsByEvent = async (req, res) => {
 
     const { uuid } = req.params;
@@ -443,6 +446,9 @@ exports.updateTicket = async (req, res) => {
         return res.status(500).json({ msg: 'Internal server error' });
     }
 }
+
+
+// Statistics of event
 
 exports.getEventStatistics = async (req, res) => {
 
