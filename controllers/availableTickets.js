@@ -201,6 +201,9 @@ exports.deleteAvailableTicket = async (req, res) => {
             return res.status(400).json({ error: 'Cannot delete available ticket with associated tickets' });
         }
 
+        
+        await availableTicket.destroy();
+
         return res.status(200).json({ msg: 'Available ticket deleted successfully' });
     } catch (error) {
         console.error(error);
