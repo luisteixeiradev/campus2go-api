@@ -107,7 +107,7 @@ exports.createAvailableTicket = async (req, res) => {
 
 exports.getAvailableTicketById = async (req, res) => {
     try {
-        const { idAvailableTicket } = req.params; // Extracting the available ticket ID from the route parameters
+        const { uuidAvailableTicket } = req.params; // Extracting the available ticket ID from the route parameters
         const { include } = req.query; // Extracting query parameters
 
         const includeArray = []; // Array to hold the includes for Sequelize
@@ -128,7 +128,7 @@ exports.getAvailableTicketById = async (req, res) => {
 
         // Fetching the available ticket by ID with includes
         const availableTicket = await models.AvailableTicket.findOne({
-            where: { uuid: idAvailableTicket },
+            where: { uuid: uuidAvailableTicket },
             include: includeArray
         });
 
@@ -147,7 +147,7 @@ exports.getAvailableTicketById = async (req, res) => {
 
 exports.updateAvailableTicket = async (req, res) => {
     try {
-        const { idAvailableTicket } = req.params; // Extracting the available ticket ID from the route parameters
+        const { uuidAvailableTicket } = req.params; // Extracting the available ticket ID from the route parameters
         const { name, price, max, zone } = req.body; // Extracting data from the request body
 
         const json = {};
@@ -159,7 +159,7 @@ exports.updateAvailableTicket = async (req, res) => {
 
         // Updating the available ticket
         const [updated] = await models.AvailableTicket.update(json, {
-            where: { uuid: idAvailableTicket }
+            where: { uuid: uuidAvailableTicket }
         });
 
         if (!updated) {
@@ -177,15 +177,28 @@ exports.updateAvailableTicket = async (req, res) => {
 
 exports.deleteAvailableTicket = async (req, res) => {
     try {
-        const { idAvailableTicket } = req.params; // Extracting the available ticket ID from the route parameters
+        const { uuidAvailableTicket } = req.params; 
 
-        // Deleting the available ticket
-        const deleted = await models.AvailableTicket.destroy({
-            where: { uuid: idAvailableTicket }
+        const availableTicket = await models.AvailableTicket.findOne({
+            where: {
+                uuid: uuidAvailableTicket,
+            },
+            include: [
+                {
+                    model: models.Ticket,
+                    as: 'tickets',
+                    required: false
+                }
+            ]
         });
 
-        if (!deleted) {
-            return res.status(404).json({ msg: 'Available ticket not found' });
+        if (!availableTicket) {
+            return res.status(404).json({ error: 'Available ticket not found' });
+        }
+
+        
+        if (availableTicket.tickets.length > 0) {
+            return res.status(400).json({ error: 'Cannot delete available ticket with associated tickets' });
         }
 
         return res.status(200).json({ msg: 'Available ticket deleted successfully' });

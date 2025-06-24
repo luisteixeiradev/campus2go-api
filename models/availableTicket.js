@@ -55,6 +55,12 @@ module.exports = (sequelize, DataTypes) => {
             targetKey: 'uuid',
             as: 'zoneDetails'
         });
+
+        AvailableTickets.hasMany(models.Ticket, {
+            foreignKey: 'availableTicket',
+            sourceKey: 'uuid',
+            as: 'tickets'
+        });
     }
 
     return AvailableTickets;
