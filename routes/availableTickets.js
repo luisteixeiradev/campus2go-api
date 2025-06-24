@@ -19,24 +19,26 @@ router.route('/')
         param('uuid').notEmpty().isUUID().withMessage('Event ID is required and must be a valid UUID'),
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
         body('price').notEmpty().isFloat({ min: 0 }).withMessage('Price is required and must be a positive number'),
-        body('capacity').notEmpty().isInt({ min: 1 }).withMessage('Max is required and must be a positive integer'),
+        body('capacity').notEmpty().isInt({ min: 0 }).withMessage('Capacity is required and must be a positive integer'),
         body('zone').optional({nullable: true}).isUUID().withMessage('Zone must be a valid UUID'),
 
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.createAvailableTicket);
 
 router.route('/:uuidAvailableTicket')
     .get([
-        param('idAvailableTicket').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID'),
+        param('uuidAvailableTicket').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID'),
         query('include').optional().isString().withMessage('Includes must be a string'),
     ], validationRoute, Controller.getAvailableTicketById)
     .put([
+        param('uuidAvailableTicket').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID'),
         body('name').optional().isString().withMessage('Name must be a string'),
         body('price').optional().isFloat({ min: 0 }).withMessage('Price must be a positive number'),
-        body('capacity').optional().isInt({ min: 1 }).withMessage('Max must be a positive integer'),
-        body('zone').optional({nullable: true}).isUUID().withMessage('Zone must be a valid UUID')
+        body('capacity').optional().isInt({ min: 0 }).withMessage('Max must be a positive integer'),
+        body('zone').optional({nullable: true}).isUUID().withMessage('Zone must be a valid UUID'),
+        body('active').optional().isBoolean().withMessage('Active must be a boolean'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.updateAvailableTicket)
     .delete([ 
-        param('idAvailableTicket').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID')
+        param('uuidAvailableTicket').notEmpty().isUUID().withMessage('Id is required and must be a valid UUID')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.deleteAvailableTicket);
 
 module.exports = router;

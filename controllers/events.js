@@ -143,7 +143,7 @@ exports.getEventById = async (req, res) => {
             return res.status(404).json({ msg: 'Event not found' });
         }
 
-        return res.status(200).json({event});
+        return res.status(200).json({ event });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: 'Internal server error' });
@@ -338,13 +338,18 @@ exports.getTicketsByEvent = async (req, res) => {
                 {
                     model: models.Answer,
                     as: 'answers',
-                    attributes: [],
-                    include: [
-                        {
-                            model: models.Form,
-                            as: 'formDetails',
-                        }
-                    ]   
+                    attributes: {
+                        include: [
+                            [
+                                models.Sequelize.literal(`(
+              SELECT f.question
+              FROM forms AS f
+              WHERE f.uuid = answers.form
+            )`),
+                                'question'
+                            ]
+                        ]
+                    }
                 }
             ],
             limit: parseInt(limit),
@@ -452,6 +457,6 @@ exports.updateTicket = async (req, res) => {
 
 exports.getEventStatistics = async (req, res) => {
 
-    
+
 
 }

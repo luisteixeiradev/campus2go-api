@@ -1,5 +1,4 @@
 const models = require('../models');
-const availableTicket = require('../models/availableTicket');
 
 exports.getAllAvailableTickets = async (req, res) => {
     try {
@@ -62,21 +61,21 @@ exports.getAllAvailableTickets = async (req, res) => {
 exports.createAvailableTicket = async (req, res) => {
 
     try {
-        const { id } = req.params; // Event ID from the route parameters
-        const { name, price, max, zone } = req.body; // Extracting data from the request body
+        const { uuid } = req.params; 
+        const { name, price, capacity, zone } = req.body; 
 
         const json = {
             name,
             price,
-            max,
-            event: id // Associate with the event using its ID
+            capacity,
+            event: uuid // Associate with the event using its ID
         };
 
         // Check if zone is zone of space event
         if (zone) {
             // Check if the zone belongs to the event's space
             const event = await models.Event.findOne({
-                where: { uuid: id },
+                where: { uuid: uuid },
                 include: [{
                     model: models.Space,
                     as: 'spaceDetails',
@@ -160,13 +159,14 @@ exports.getAvailableTicketById = async (req, res) => {
 exports.updateAvailableTicket = async (req, res) => {
     try {
         const { uuidAvailableTicket } = req.params; // Extracting the available ticket ID from the route parameters
-        const { name, price, max, zone } = req.body; // Extracting data from the request body
+        const { name, price, capacity, active, zone } = req.body; // Extracting data from the request body
 
-        const json = {};
+        const json = {};        
 
         if (name) json.name = name;
         if (price) json.price = price;
-        if (max) json.max = max;
+        if (capacity !== undefined) json.capacity = capacity;
+        if (active !== undefined) json.active = active; // Check if active is provided
         if (zone) json.zone = zone;
 
         // Updating the available ticket
