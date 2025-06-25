@@ -79,6 +79,8 @@ router.route('/:uuid/tickets')
         query('order').optional().isString().withMessage('Order must be a string'),
         query('status').optional().isString().withMessage('Status must be a string').isIn(['available', 'reserved', 'expired']),
         query('email').optional().isEmail().withMessage('Email must be a valid email address'),
+        query('name').optional().isString().withMessage('Name must be a string'),
+        query('include').optional().isString().withMessage('Includes must be a string'),
         query('availableTicket').optional().isUUID().withMessage('ID must be a valid UUID'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.getTicketsByEvent)
 

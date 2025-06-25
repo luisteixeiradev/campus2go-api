@@ -305,37 +305,34 @@ exports.uploadEventImage = async (req, res) => {
 exports.getTicketsByEvent = async (req, res) => {
 
     const { uuid } = req.params;
-    const { page = 1, limit = 10, sort = 'createdAt', order = 'asc', status, email, availableTicket } = req.query;
+    const { page = 1, limit = 10, sort = 'createdAt', order = 'asc', status, email, name, availableTicket, include } = req.query;
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    try {
-        const tickets = await models.Ticket.findAndCountAll({
-            where: {
-                ...(status ? { status } : {}),
-                ...(email ? { email } : {}),
-                ...(availableTicket ? { availableTicket } : {}),
-                // availableTicket: {
-                //     [models.Sequelize.Op.in]: models.Sequelize.literal(`(
-                //         SELECT uuid FROM luistei3_campus2go.availableTickets WHERE event = '${uuid}' AND active = true
-                //     )`)
-                // }
-            },
-            include: [
-                {
-                    model: models.AvailableTicket,
-                    as: 'availableTicketDetails',
-                    where: { event: uuid },
-                    attributes: ['uuid', 'name', 'price', 'zone'],
-                    include: [
-                        {
-                            model: models.Zone,
-                            as: 'zoneDetails',
-                            attributes: ['uuid', 'name']
-                        }
-                    ]
-                },
-                {
+    const includeArray = [];
+
+    if (include) {
+        const includes = include.split(',');
+
+        includes.forEach((inc) => {
+            if (inc === 'availableTicket') {
+                includeArray.push(
+                    {
+                        model: models.AvailableTicket,
+                        as: 'availableTicketDetails',
+                        // where: { event: uuid },
+                        include: [
+                            {
+                                model: models.Zone,
+                                as: 'zoneDetails',
+                                // attributes: ['uuid', 'name']
+                                required: false
+                            }
+                        ]
+                    }
+                );
+            } else if (inc === 'answers') {
+                includeArray.push({
                     model: models.Answer,
                     as: 'answers',
                     attributes: {
@@ -350,8 +347,25 @@ exports.getTicketsByEvent = async (req, res) => {
                             ]
                         ]
                     }
-                }
-            ],
+                });
+            }
+        });
+    }
+
+    try {
+        const tickets = await models.Ticket.findAndCountAll({
+            where: {
+                ...(status ? { status } : {}),
+                ...(email ? { email } : {}),
+                ...(name ? { name: { [models.Sequelize.Op.like]: `%${name}%` } } : {}),
+                ...(availableTicket ? { availableTicket } : {}),
+                // availableTicket: {
+                //     [models.Sequelize.Op.in]: models.Sequelize.literal(`(
+                //         SELECT uuid FROM luistei3_campus2go.availableTickets WHERE event = '${uuid}' AND active = true
+                //     )`)
+                // }
+            },
+            include: includeArray,
             limit: parseInt(limit),
             offset,
             order: [[sort, order]],
