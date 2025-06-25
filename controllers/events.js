@@ -431,14 +431,13 @@ exports.getTicketById = async (req, res) => {
 }
 
 exports.updateTicket = async (req, res) => {
-    const { uuid, ticketUuid } = req.params;
-    const { status, email, validated, availableTicket, name } = req.body;
+    const { ticketUuid } = req.params;
+    const { email, validated, availableTicket, name } = req.body;
 
     try {
         const ticket = await models.Ticket.findOne({
             where: {
                 uuid: ticketUuid,
-                event: uuid
             }
         });
 
@@ -447,7 +446,6 @@ exports.updateTicket = async (req, res) => {
         }
 
         const updatedData = {
-            status,
             email,
             validated,
             availableTicket,

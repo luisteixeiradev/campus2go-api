@@ -77,7 +77,6 @@ router.route('/:uuid/tickets')
         query('limit').optional().isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
         query('sort').optional().isString().withMessage('Sort must be a string'),
         query('order').optional().isString().withMessage('Order must be a string'),
-        query('status').optional().isString().withMessage('Status must be a string').isIn(['available', 'reserved', 'expired']),
         query('email').optional().isEmail().withMessage('Email must be a valid email address'),
         query('name').optional().isString().withMessage('Name must be a string'),
         query('include').optional().isString().withMessage('Includes must be a string'),
