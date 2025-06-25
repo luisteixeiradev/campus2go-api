@@ -113,11 +113,11 @@ exports.bulkUpdateForms = async (req, res) => {
 
 exports.getFormById = async (req, res) => {
 
-    const { formId, formUuid } = req.params;
+    const { formUuid } = req.params;
 
     try {
         const form = await models.Form.findOne({
-            where: { uuid: formId, event: formUuid },
+            where: { uuid: formUuid },
         });
 
         if (!form) {
@@ -136,12 +136,12 @@ exports.getFormById = async (req, res) => {
 
 exports.updateForm = async (req, res) => {
 
-    const { formId, formUuid } = req.params;
+    const { formUuid } = req.params;
     const { question, type, required, options, order } = req.body;
 
     try {
         const form = await models.Form.findOne({
-            where: { uuid: formId, event: formUuid },
+            where: { uuid: formUuid },
         });
 
         if (!form) {

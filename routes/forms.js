@@ -53,10 +53,10 @@ router.route('/bulk')
 
 router.route('/:formUuid')
     .get([
-        param('formId').isUUID().withMessage('Form ID must be a valid UUID')
+        param('formUuid').isUUID().withMessage('Form ID must be a valid UUID')
     ], validationRoute, Controller.getFormById)
     .put([
-        param('formId').isUUID().withMessage('Form ID must be a valid UUID'),
+        param('formUuid').isUUID().withMessage('Form ID must be a valid UUID'),
         body('question').optional().isString().withMessage('Question must be a string'),
         body('type').optional().isString().withMessage('Type must be a string'),
         body('required').optional().isBoolean().withMessage('Required must be a boolean'),
@@ -67,7 +67,7 @@ router.route('/:formUuid')
         body('order').optional().isInt({ min: 0 }).withMessage('Order must be a non-negative integer')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.updateForm)
     .delete([
-        param('formId').isUUID().withMessage('Form ID must be a valid UUID')
+        param('formUuid').isUUID().withMessage('Form ID must be a valid UUID')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.deleteForm);
 
 module.exports = router;
