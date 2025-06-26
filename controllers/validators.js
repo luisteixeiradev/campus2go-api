@@ -1,4 +1,3 @@
-const { parse } = require('dotenv');
 const models = require('../models');
 
 exports.getAllValidators = async (req, res) => {
@@ -8,7 +7,7 @@ exports.getAllValidators = async (req, res) => {
     try {
         const options = {
             where: { event: uuid },
-            order: [['createdAt', 'DESC']],
+            order: [['createdAt', 'ASC']],
             offset: (page - 1) * limit,
             limit: parseInt(limit, 10),
         };
