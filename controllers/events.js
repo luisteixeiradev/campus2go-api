@@ -104,11 +104,13 @@ exports.getEventById = async (req, res) => {
                     includeArray.push({
                         model: models.Promoter,
                         as: 'promoterDetails',
+                        required: false,
                     });
                 } else if (inc === 'space') {
                     includeArray.push({
                         model: models.Space,
-                        as: 'spaceDetails'
+                        as: 'spaceDetails',
+                        required: false,
                     });
                 } else if (inc === 'availableTickets') {
                     includeArray.push({
