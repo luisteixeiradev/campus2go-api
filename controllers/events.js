@@ -104,13 +104,13 @@ exports.getEventById = async (req, res) => {
                     includeArray.push({
                         model: models.Promoter,
                         as: 'promoterDetails',
-                        attributes: ['uuid', 'name', 'vat', 'address', 'email', 'phone']
+                        attributes: []
                     });
                 } else if (inc === 'space') {
                     includeArray.push({
                         model: models.Space,
                         as: 'spaceDetails',
-                        attributes: ['uuid', 'name', 'address'],
+                        
 
                     });
                 } else if (inc === 'availableTickets') {
@@ -119,12 +119,11 @@ exports.getEventById = async (req, res) => {
                         as: 'availableTickets',
                         where: { active: availableTickets == 'true' ? true : false },
                         required: false,
-                        attributes: ['uuid', 'name', 'price', 'capacity', 'active'],
                         include: [
                             {
                                 model: models.Zone,
                                 as: 'zoneDetails',
-                                attributes: ['uuid', 'name', 'space', 'capacity'],
+                                required: false
                             }
                         ]
                     });
