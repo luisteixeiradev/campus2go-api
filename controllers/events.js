@@ -124,7 +124,17 @@ exports.getEventById = async (req, res) => {
                                 as: 'zoneDetails',
                                 required: false
                             }
-                        ]
+                        ],
+                        attributes: {
+                            include: [
+                                [
+                                    models.Sequelize.literal(`(
+                                                SELECT COUNT(*) FROM tickets AS t WHERE t.availableTicket = availableTickets.uuid AND t.status IN ('reserved', 'available')
+                                                )`),
+                                    'sold'
+                                ]
+                            ]
+                        },
                     });
                 }
             });
