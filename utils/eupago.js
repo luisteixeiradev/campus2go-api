@@ -8,9 +8,9 @@ exports.payByLink = async (data) => {
                 amount: { currency: 'EUR', value: data.total_amount },
                 lang: 'PT',
                 identifier: data.uuid,
-                successUrl: 'https://campus2go.luisteixera.dev/purchases/success',
-                failUrl: 'https://campus2go.luisteixera.dev/purchases/fail',
-                backUrl: 'https://campus2go.luisteixera.dev/purchases/back',
+                successUrl: process.env.APP_URL + '/payment/success',
+                // failUrl: 'https://campus2go.luisteixera.dev/purchases/fail',
+                // backUrl: 'https://campus2go.luisteixera.dev/purchases/back',
             },
             customer: {
                 name: data.name,
