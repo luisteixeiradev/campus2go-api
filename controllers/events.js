@@ -328,7 +328,7 @@ exports.getTicketsByEvent = async (req, res) => {
                     {
                         model: models.AvailableTicket,
                         as: 'availableTicketDetails',
-                        // where: { event: uuid },
+                        where: { event: uuid },
                         include: [
                             {
                                 model: models.Zone,
