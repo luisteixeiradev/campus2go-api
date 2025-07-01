@@ -1,15 +1,13 @@
 const models = require('../models');
 const token = require('../utils/token');
 const eupago = require('../utils/eupago');
-const e = require('express');
-const { where } = require('sequelize');
 
 exports.getPurchases = async (req, res) => {
     try {
         const { user } = req;
 
         const purchases = await models.Purchase.findAll({
-            where: { userUuid: user.uuid },
+            where: { user: user.uuid },
             include: [{
                 model: models.Ticket,
                 include: [{

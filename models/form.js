@@ -45,6 +45,11 @@ module.exports = (sequelize, DataTypes) => {
             as: 'eventDetails'
         });
 
+        Form.hasMany(models.Answer, {
+            foreignKey: 'form',
+            as: 'answers'
+        });
+
         // Form.hasMany(models.FormResponse, {
         //     foreignKey: 'form',
         //     as: 'responses'
