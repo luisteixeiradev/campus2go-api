@@ -35,6 +35,12 @@ router.route('/pay')
         query('token').notEmpty().withMessage('Token is required').isJWT().withMessage('Token must be a valid JWT'),
     ], validationRoute, Controller.payPurchase)
 
+router.route('/pay/confirm')
+    .get([
+        query('identificador').notEmpty().withMessage('Identifier is required').isUUID().withMessage('Identifier must be a valid UUID'),
+        query('chave_api').notEmpty().withMessage('API key is required').isString().withMessage('API key must be a string')
+    ],validationRoute, Controller.confirmPurchasePayment);
+
 // router.route('/:purchaseId')
 //     .get([
 //         param('purchaseId').isUUID().withMessage('Purchase ID must be a valid UUID'),

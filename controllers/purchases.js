@@ -277,3 +277,48 @@ exports.deletePurchase = async (req, res) => {
         return res.status(500).send({ error: "Error deleting purchase" });
     }
 }
+
+exports.confirmPurchasePayment = async (req, res) => {
+
+    try {
+        const { identificador, chave_api } = req.query;
+
+        console.log("Confirming purchase payment with identificador:", req.query);
+        
+
+        if (chave_api == process.env.EUPAGO_API_KEY) {
+            const purchase = await models.Purchase.findOne({
+                where: { uuid: identificador, status: 'waiting_payment' },
+                include: [{
+                    model: models.Ticket,
+                    as: 'tickets',
+                }],
+            });
+
+            if (!purchase) {
+                return res.status(404).send({ error: "Purchase not found or already paid" });
+            }
+
+            purchase.status = 'paid';
+            await purchase.tickets.forEach(ticket => {
+                ticket.status = 'available';
+            });
+
+            await models.sequelize.transaction(async (transaction) => {
+                await purchase.save({ transaction });
+                await Promise.all(purchase.tickets.map(ticket => ticket.save({ transaction })));
+            });
+
+            res.status(200).send({
+                message: "Purchase payment confirmed successfully",
+                purchase
+            });
+            
+        }
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ error: "Error confirming purchase payment" });
+    }
+
+}
