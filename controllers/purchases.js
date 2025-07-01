@@ -130,6 +130,14 @@ exports.createPurchase = async (req, res) => {
                                 attributes: ['question']
                             }
                         ]
+                    },
+                    {
+                        model: models.AvailableTicket,
+                        as: 'availableTicketDetails',
+                        include: [{
+                            model: models.Event,
+                            as: 'eventDetails',
+                        }]
                     }]
                 }]
             });
