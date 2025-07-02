@@ -21,7 +21,7 @@ exports.validateEmail = async (user) => {
         from: process.env.EMAIL_FROM,
         to: user.email,
         subject: 'Validação de Email',
-        text: `Por favor valide o seu email.\nlink: ${process.env.APP_URL}/validate/${userToken}`
+        text: `Por favor valide o seu email.\nlink: ${process.env.APP_URL}/validate?token=${userToken}`
     };
 
     try {
