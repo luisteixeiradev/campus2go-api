@@ -1,6 +1,7 @@
 const models = require('../models');
 const token = require('../utils/token');
 const eupago = require('../utils/eupago');
+const generateTicket = require('../utils/generateTicket');
 
 exports.getPurchases = async (req, res) => {
     try {
@@ -204,6 +205,14 @@ exports.payPurchase = async (req, res) => {
                     include: [{
                         model: models.Event,
                         as: 'eventDetails',
+                        include: [{
+                            model: models.Promoter,
+                            as: 'promoterDetails',
+                        },
+                        {
+                            model: models.Space,
+                            as: 'spaceDetails',
+                        }]
                     }]
                 }]
             }],
@@ -225,10 +234,12 @@ exports.payPurchase = async (req, res) => {
                 await purchase.save({ transaction });
                 await Promise.all(purchase.tickets.map(ticket => ticket.save({ transaction })));
             });
-            return res.status(200).send({
-                message: "Purchase completed successfully",
+            res.status(200).send({
+                msg: "Purchase completed successfully",
                 purchase
             });
+
+            generateTicket(purchase);
 
         } else {
             const data = await eupago.payByLink(purchase);
@@ -238,7 +249,7 @@ exports.payPurchase = async (req, res) => {
             });
             purchase.status = 'waiting_payment';
             purchase.save();
-            
+
         }
 
 
@@ -284,7 +295,7 @@ exports.confirmPurchasePayment = async (req, res) => {
         const { identificador, chave_api } = req.query;
 
         console.log("Confirming purchase payment with identificador:", req.query);
-        
+
 
         if (chave_api == process.env.EUPAGO_API_KEY) {
             const purchase = await models.Purchase.findOne({
@@ -313,7 +324,7 @@ exports.confirmPurchasePayment = async (req, res) => {
                 message: "Purchase payment confirmed successfully",
                 purchase
             });
-            
+
         }
 
     } catch (error) {

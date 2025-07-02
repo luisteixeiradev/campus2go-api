@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer');
 const token = require('./token');
+const path = require('path');
+const fs = require('fs');
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -18,8 +20,8 @@ exports.validateEmail = async (user) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: 'Email Verification',
-        text: `Please verify your email address.\nlink: ${process.env.APP_URL}/auth/validate/${userToken}`
+        subject: 'Validação de Email',
+        text: `Por favor valide o seu email.\nlink: ${process.env.APP_URL}/validate/${userToken}`
     };
 
     try {
@@ -41,8 +43,8 @@ exports.forgotPassword = async (user) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: 'Password Reset',
-        text: `Please reset your password.\nlink: ${process.env.APP_URL}/auth/reset-password/${userToken}`
+        subject: 'Recuperar password',
+        text: `Por favor reponha a sua password.\nLink: ${process.env.APP_URL}?action=resetpassword&token=${userToken}`
     };
 
     try {
@@ -60,8 +62,8 @@ exports.changedPassword = async (user) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: 'Password Changed',
-        text: `Your password has been changed.`
+        subject: 'Alteração de password',
+        text: `A sua password foi alterada.`
     };
 
     try {
@@ -79,8 +81,8 @@ exports.emailChanged = async (user) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: 'Email Changed',
-        text: `Your email has been changed.`
+        subject: 'Aletração de email',
+        text: `O seu email foi alterado.`
     };
 
     try {
@@ -98,8 +100,8 @@ exports.PromoterCreated = async (user, password) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: 'Promoter Created',
-        text: `Your account has been created.\nEmail: ${user.email}\nPassword: ${password}`
+        subject: 'Promotor Criado',
+        text: `O sua conta de promotor foi criada.\nEmail: ${user.email}\nPassword: ${password}`
     };
 
     try {
@@ -117,8 +119,36 @@ exports.userDeleted = async (user) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: 'Account Deleted',
-        text: `Your account has been deleted.`
+        subject: 'Eliminação de conta',
+        text: `A sua conta foi eliminada.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return false;
+    }
+
+}
+
+exports.sendTickets = async (purchase) => {
+
+    const eventName = purchase.tickets[0].availableTicketDetails.eventDetails.name;
+
+    const attachments = purchase.tickets.map(ticket => ({
+        filename: `${ticket.uuid}.pdf`,
+        path: path.join(__dirname, '../tickets', `${ticket.uuid}.pdf`),
+        contentType: 'application/pdf'
+    }));
+
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: purchase.email,
+        subject: `Bilhetes - ${eventName}`,
+        text: `Os seus bilhetes, para o evento ${eventName}, foram gerados com sucesso.`,
+        attachments: attachments
     };
 
     try {
