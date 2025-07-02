@@ -1,4 +1,9 @@
 const models = require('../models');
+const json2csv = require('json-2-csv');
+const { convertCsvToXlsx } = require('@aternus/csv-to-xlsx');
+const path = require('path');
+const fs = require('fs');
+const sendEmails = require('../utils/sendEmails')
 
 exports.getAllEvents = async (req, res) => {
 
@@ -472,6 +477,133 @@ exports.updateTicket = async (req, res) => {
     }
 }
 
+exports.exportTickets = async (req, res) => {
+    const { uuid } = req.params;
+    const { email } = req.user;
+
+    try {
+
+        const tickets = await models.Ticket.findAll({
+            include: [
+                {
+                    model: models.AvailableTicket,
+                    as: 'availableTicketDetails',
+                    where: { event: uuid },
+                },
+                {
+                    model: models.Answer,
+                    as: 'answers',
+                    // include: [
+                    //     {
+                    //         model: models.Form,
+                    //         as: 'formDetails',
+                    //     }
+                    // ]
+                }
+            ]
+        });
+
+        if (tickets.length === 0) {
+            return res.status(404).json({ msg: 'No tickets found for this event' });
+        }
+
+        const forms = await models.Form.findAll({
+            where: { event: uuid }
+        });
+
+
+        const data = tickets.map(ticket => {
+            return {
+                uuid: ticket.uuid,
+                email: ticket.email,
+                name: ticket.name,
+                status: ticket.status,
+                type: ticket.availableTicketDetails.name,
+                validated: ticket.validated,
+                answers: forms.length > 0 ? ticket.answers : ''
+            }
+        })
+
+        if (forms.length > 0) {
+
+            await forms.forEach(form => {
+                data.forEach(ticket => {
+                    ticket[form.question] = ticket.answers.find((answer) => answer.form == form.uuid)?.answer || '';
+                });
+            });
+
+            await data.forEach(ticket => delete ticket.answers)
+
+        }
+
+        const csv = json2csv.json2csv(data);
+
+        if (!fs.existsSync(path.join(__dirname, '..', 'temp/exports'))) {
+            fs.mkdirSync(path.join(__dirname, '..', 'temp/exports'), { recursive: true });
+        }
+
+        fs.writeFileSync(path.join(__dirname, `../temp/exports/tickets_${uuid}.csv`), csv);
+
+        const source = path.join(__dirname, `../temp/exports/tickets_${uuid}.csv`);
+        const destination = path.join(__dirname, `../temp/exports/tickets_${uuid}.xlsx`);
+
+        convertCsvToXlsx(source, destination);
+
+
+        res.status(200).json({ msg: 'Tickets will sent to your email' });
+
+        await sendEmails.sendExportTickets(uuid, email);
+
+        fs.unlinkSync(path.join(__dirname, `../temp/exports/tickets_${uuid}.csv`));
+        fs.unlinkSync(path.join(__dirname, `../temp/exports/tickets_${uuid}.xlsx`));
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+
+    }
+}
+
+exports.resendTicket = async (req, res) => {
+
+    const { ticketUuid } = req.params;
+
+    try {
+
+        const ticket = await models.Ticket.findOne({
+            where: {
+                uuid: ticketUuid,
+            },
+            include: [
+                {
+                    model: models.AvailableTicket,
+                    as: 'availableTicketDetails',
+                    include: [
+                        {
+                            model: models.Event,
+                            as: 'eventDetails',
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (!ticket) {
+            return res.status(404).json({ msg: 'Ticket not found' });
+        }
+
+        res.status(200).send({
+            msg: 'Ticket sent'
+        })
+
+        sendEmails.resendTickets(ticket)
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+    }
+
+}
 
 // Statistics of event
 

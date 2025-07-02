@@ -83,13 +83,10 @@ router.route('/:uuid/tickets')
         query('availableTicket').optional().isUUID().withMessage('ID must be a valid UUID'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.getTicketsByEvent)
 
-// router.route('/:uuid/tickets/export')
-//     .get([
-//         param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
-//         query('status').optional().isString().withMessage('Status must be a string').isIn(['available', 'reserved', 'expired']),
-//         query('email').optional().isEmail().withMessage('Email must be a valid email address'),
-//         query('availableTicket').optional().isUUID().withMessage('ID must be a valid UUID'),
-//     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.exportTickets);
+router.route('/:uuid/tickets/export')
+    .get([
+        param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.exportTickets);
 
 router.route('/:uuid/tickets/:ticketUuid')
     .get([
@@ -106,10 +103,10 @@ router.route('/:uuid/tickets/:ticketUuid')
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.updateTicket)
 
 router.route('/:uuid/tickets/:ticketUuid/resend')
-    // .post([
-    //     param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
-    //     param('ticketUuid').isUUID().withMessage('Ticket ID must be a valid UUID'),
-    // ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.resendTicket);
+    .get([
+        param('uuid').isUUID().withMessage('Event ID must be a valid UUID'),
+        param('ticketUuid').isUUID().withMessage('Ticket ID must be a valid UUID'),
+    ], validationRoute, auth.auth, auth.isPromoterOrAdmin, auth.isAvailableEvent, Controller.resendTicket);
 
 router.use('/:uuid/validators', require('./validators'));
 

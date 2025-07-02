@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const token = require('./token');
 const path = require('path');
 const fs = require('fs');
+const ticket = require('../models/ticket');
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -38,7 +39,7 @@ exports.forgotPassword = async (user) => {
 
     console.log(user.uuid);
 
-    const userToken = await token.generateToken(user , 'forgotPassword');
+    const userToken = await token.generateToken(user, 'forgotPassword');
 
     const mailOptions = {
         from: process.env.EMAIL_FROM,
@@ -115,7 +116,7 @@ exports.PromoterCreated = async (user, password) => {
 }
 
 exports.userDeleted = async (user) => {
-    
+
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
@@ -158,5 +159,67 @@ exports.sendTickets = async (purchase) => {
         console.error('Error sending email:', error);
         return false;
     }
+
+}
+
+exports.sendExportTickets = async (eventUuid, email) => {
+
+    const attachments = [
+        {
+            filename: `tickets_${eventUuid}.csv`,
+            path: path.join(__dirname, '../temp/exports', `tickets_${eventUuid}.csv`),
+        },
+        {
+            filename: `tickets_${eventUuid}.xlsx`,
+            path: path.join(__dirname, '../temp/exports', `tickets_${eventUuid}.xlsx`),
+        }
+    ]
+
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: email,
+        subject: `Bilhetes Exportados`,
+        text: `Os seus bilhetes foram exportados com sucesso.`,
+        attachments: attachments
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return false;
+    }
+
+}
+
+exports.resendTickets = async (ticket) => {
+
+    const eventName = ticket.availableTicketDetails.eventDetails.name;
+
+    const attachments = [
+        {
+            filename: `${ticket.uuid}.pdf`,
+            path: path.join(__dirname, '../tickets', `${ticket.uuid}.pdf`),
+            contentType: 'application/pdf'
+        }
+    ]
+
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: ticket.email,
+        subject: `Bilhetes - ${eventName}`,
+        text: `Os seus bilhetes, para o evento ${eventName}, foram gerados com sucesso.`,
+        attachments: attachments
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return false;
+    }
+
 
 }
