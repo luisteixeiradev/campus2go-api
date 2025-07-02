@@ -233,9 +233,16 @@ exports.authenticateValidator = async (req, res) => {
                 model: models.Event,
                 as: 'eventDetails',
                 where: {
-                    startDate: {
-                        [models.Sequelize.Op.lte]: new Date()
-                    }
+                    [models.Sequelize.Op.or]: [
+                        { startDate: { [models.Sequelize.Op.gte]: new Date() } },
+                        { endDate: { [models.Sequelize.Op.lte]: new Date() } }
+                    ]
+                    // startDate: {
+                    //     [models.Sequelize.Op.gte]: new Date()
+                    // },
+                    // endDate: {
+                    //     [models.Sequelize.Op.lte]: new Date()
+                    // }
                 },
                 attributes: [],
             }]
