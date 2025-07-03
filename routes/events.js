@@ -64,8 +64,6 @@ router.route('/:uuid/image')
 router.route('/:uuid/statistics')
     .get([
         param('uuid').isUUID().withMessage('ID must be a valid UUID'),
-        query('startDate').optional().isISO8601().withMessage('Start date must be a valid date'),
-        query('endDate').optional().isISO8601().withMessage('End date must be a valid date'),
     ], validationRoute, auth.auth, auth.isPromoterOrAdmin, Controller.getEventStatistics);
 
 router.use('/:uuid/available-tickets', require('./availableTickets'));

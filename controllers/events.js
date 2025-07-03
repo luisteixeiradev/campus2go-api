@@ -3,7 +3,9 @@ const json2csv = require('json-2-csv');
 const { convertCsvToXlsx } = require('@aternus/csv-to-xlsx');
 const path = require('path');
 const fs = require('fs');
-const sendEmails = require('../utils/sendEmails')
+const sendEmails = require('../utils/sendEmails');
+const e = require('express');
+const { where } = require('sequelize');
 
 exports.getAllEvents = async (req, res) => {
 
@@ -597,7 +599,7 @@ exports.resendTicket = async (req, res) => {
         })
 
         sendEmails.resendTickets(ticket)
-        
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: 'Internal server error' });
@@ -609,6 +611,87 @@ exports.resendTicket = async (req, res) => {
 
 exports.getEventStatistics = async (req, res) => {
 
+    const { uuid } = req.params;
 
+    try {
+
+        const event = await models.Event.findOne({
+            where: {
+                uuid: uuid
+            },
+            attributes: {
+                include: [
+                    [
+                        models.Sequelize.literal(`(
+                                    SELECT COUNT(*) FROM tickets AS t JOIN available_tickets as at ON t.availableTicket = at.uuid where event = '${uuid}' AND t.validated = 1
+                                )`),
+                        'validated'
+
+                    ],
+                    [
+                        models.Sequelize.literal(`(
+                                    SELECT COUNT(*) FROM tickets AS t JOIN available_tickets as at ON t.availableTicket = at.uuid WHERE event = '${uuid}' AND t.status IN ('available')
+                                )`),
+                        'sold'
+                    ],
+                    [
+                        models.Sequelize.literal(`(
+                                    SELECT SUM(t.price) FROM tickets AS t JOIN available_tickets as at ON t.availableTicket = at.uuid WHERE event = '${uuid}' AND t.status IN ('available')
+                                )`),
+                        'total_amount'
+                    ],
+                    [
+                        models.Sequelize.literal(`(
+                                    SELECT SUM(t.price) * 0.95 FROM tickets AS t JOIN available_tickets as at ON t.availableTicket = at.uuid WHERE event = '${uuid}' AND t.status IN ('available')
+                                )`),
+                        'total_promoter_amount'
+                    ],
+                    [
+                        models.Sequelize.literal(`(
+                                    SELECT SUM(t.price) * 0.05 FROM tickets AS t JOIN available_tickets as at ON t.availableTicket = at.uuid WHERE event = '${uuid}' AND t.status IN ('available')
+                                )`),
+                        'total_fee_amount'
+                    ]
+                ]
+            },
+            include: [
+                {
+                    model: models.AvailableTicket,
+                    as: 'availableTickets',
+                    attributes: {
+                        include: [
+                            [
+                                models.Sequelize.literal(`(
+                                    SELECT COUNT(*) FROM tickets AS t WHERE t.availableTicket = availableTickets.uuid AND t.status IN ('available')
+                                )`),
+                                'sold'
+                            ],
+                            [
+                                models.Sequelize.literal(`(
+                                    SELECT COUNT(*) FROM tickets AS t WHERE t.availableTicket = availableTickets.uuid AND t.validated = true
+                                )`),
+                                'validated'
+                            ],
+                            [
+                                models.Sequelize.literal(`(
+                                    SELECT SUM(price) FROM tickets AS t WHERE t.availableTicket = availableTickets.uuid AND t.status IN ('available')
+                                )`),
+                                'total_amount'
+                            ]
+
+                        ],
+                        exclude: ['event', 'zone', 'active', 'createdAt', 'updatedAt']
+
+                    }
+                }
+            ]
+        })
+
+        res.status(200).json(event);
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: 'Internal server error' });
+    }
 
 }

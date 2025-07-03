@@ -71,17 +71,17 @@ router.route('/:uuid/users')
         param('uuid').notEmpty().isString().withMessage('UUID is required and must be a string'),
         body('name').notEmpty().isString().withMessage('Name is required and must be a string'),
         body('email').notEmpty().isEmail().withMessage('Email is required and must be a valid email'),
-    ], validationRoute, auth.auth, auth.isAdmin, Controller.createPromoterUser)
+    ], validationRoute, auth.auth, auth.isAvailablePromoter, Controller.createPromoterUser)
 
 router.route('/:uuid/users/:userUuid')
     .get([
         param('uuid').notEmpty().isString().withMessage('UUID is required and must be a string'),
         param('userUuid').notEmpty().isString().withMessage('User UUID is required and must be a string'),
-    ], validationRoute, auth.auth, auth.isAdmin, Controller.getPromoterUser)
+    ], validationRoute, auth.auth, auth.isAvailablePromoter, Controller.getPromoterUser)
     .delete([
         param('uuid').notEmpty().isString().withMessage('UUID is required and must be a string'),
         param('userUuid').notEmpty().isString().withMessage('User UUID is required and must be a string'),
-    ], validationRoute, auth.auth, auth.isAdmin, Controller.deletePromoterUser)
+    ], validationRoute, auth.auth, auth.isAvailablePromoter, Controller.deletePromoterUser)
 
 router.route('/:uuid/events')
     .get([

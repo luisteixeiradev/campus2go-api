@@ -47,10 +47,17 @@ exports.validateTicket = async (req, res) => {
         await ticket.save();
 
 
-        return res.status(200).send({
+        res.status(200).send({
             msg: "Ticket validated successfully",
         });
 
+        const socket = req.app.get('socketio');
+        socket.emit('stats_' + ticket.availableTicketDetails.event, {
+            action: 'validate',
+            ticket: {
+                availableTicket: ticket.availableTicketDetails.uuid,
+            }
+        });
     } catch (error) {
         console.error("Error validating ticket:", error);
         return res.status(500).send({

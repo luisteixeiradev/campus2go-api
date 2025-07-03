@@ -91,7 +91,10 @@ exports.getPromoterFromUser = async (user) => {
 exports.getValidatorFromToken = async (token, req) => {
 
     try {
-        const decoded = await this.decodeToken(token);       
+        const decoded = await this.decodeToken(token);
+        
+        console.log(decoded);
+        
 
         if (decoded.type !== 'validator') {
             throw new Error('Invalid token type');

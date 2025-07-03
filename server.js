@@ -1,7 +1,16 @@
 const express = require('express');
 const app = express();
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
 require('dotenv').config();
+
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*"
+  }
+});
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -15,6 +24,8 @@ models.sequelize
     .catch((err) => console.error("Erro ao sincronizar BD:", err));
 
 app.use(require('./routes/index'));
+app.set('socketio', io);
+
 // require('./utils/sessionCleaner') // Importando o limpador de sessões expiradas
 
 app.get('/', (req, res) => {
@@ -23,7 +34,7 @@ app.get('/', (req, res) => {
 
 });
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
 
     console.log(`Server is running on port ${process.env.PORT}`);
 });
