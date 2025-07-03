@@ -7,27 +7,28 @@ const e = require('express');
 exports.getAllUsers = async (req, res) => {
 
     try {
-        const { page = 1, limit = 10, sort = 'createdAt', fields } = req.query;
+        const { page = 1, limit = 10, sort = 'createdAt', order = 'asc' } = req.query;
 
         const options = {
             where: {
                 ...(req.query.email && { email: { [Op.like]: `%${req.query.email}%` } }),
                 ...(req.query.name && { name: { [Op.like]: `%${req.query.name}%` } }),
                 ...(req.query.active && { active: req.query.active }),
-                ...(req.query.uuid && { uuid: req.query.uuid }),
             },
-            order: [[sort, 'DESC']],
+            order: [[sort, order]],
             limit: parseInt(limit),
             offset: (page - 1) * parseInt(limit)
         };
 
-        if (fields) {
-            options.attributes = fields.split(',');
-        }
-
         const users = await models.User.findAndCountAll(options);
 
-        return res.status(200).send(users);
+        return res.status(200).json({
+            users: users.rows,
+            totalItems: users.count,
+            totalPages: Math.ceil(users.count / limit),
+            currentPage: parseInt(page),
+            itemsPerPage: parseInt(limit)
+        });
     } catch (error) {
         console.log(error);
         

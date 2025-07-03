@@ -15,11 +15,10 @@ router.route('/')
         query('page').optional().isNumeric().withMessage('Page must be a number'),
         query('limit').optional().isNumeric().withMessage('Limit must be a number'),
         query('sort').optional().isString().withMessage('Sort must be a string'),
-        query('fields').optional().isString().withMessage('Fields must be a string'),
+        query('order').optional().isIn(['asc', 'desc']).withMessage('Order must be either asc or desc'),
         query('email').optional().isEmail().withMessage('Email must be a valid email'),
         query('name').optional().isString().withMessage('Name must be a string'),
         query('active').optional().isBoolean().withMessage('Active must be a boolean'),
-        query('uuid').optional().isUUID().withMessage('UUID must be a valid UUID'),
     ], validationRoute, auth.auth, auth.isAdmin, Controller.getAllUsers)
     // .post([
     //     body('name').notEmpty().isString().withMessage('Name is required and must be a string'),

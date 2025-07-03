@@ -303,6 +303,22 @@ exports.confirmPurchasePayment = async (req, res) => {
                 include: [{
                     model: models.Ticket,
                     as: 'tickets',
+                    include: [{
+                        model: models.AvailableTicket,
+                        as: 'availableTicketDetails',
+                        include: [{
+                            model: models.Event,
+                            as: 'eventDetails',
+                            include: [{
+                                model: models.Promoter,
+                                as: 'promoterDetails',
+                            },
+                            {
+                                model: models.Space,
+                                as: 'spaceDetails',
+                            }]
+                        }]
+                    }]
                 }],
             });
 
@@ -324,6 +340,8 @@ exports.confirmPurchasePayment = async (req, res) => {
                 message: "Purchase payment confirmed successfully",
                 purchase
             });
+
+            generateTicket(purchase);
 
         }
 
