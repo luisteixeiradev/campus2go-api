@@ -322,6 +322,7 @@ exports.confirmPurchasePayment = async (req, res) => {
                 }],
             });
 
+
             if (!purchase) {
                 return res.status(404).send({ error: "Purchase not found or already paid" });
             }
